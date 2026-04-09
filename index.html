@@ -100,10 +100,12 @@
                 const data = await res.json();
                 
                 // 【核心修改】：這裡改為只抓 RCTP 開頭的呼號
-                const controllers = data.controllers.filter(c => c.callsign.startsWith('RCTP' , 'RCSS' , 'RCKH' , 'TPE'));
+                const controllers = data.controllers.filter(c => c.callsign.startsWith('RCTP'));
+                const controllers = data.controllers.filter(c => c.callsign.startsWith('RCSS'));
+                const controllers = data.controllers.filter(c => c.callsign.startsWith('RCKH'));
                 
                 const container = document.getElementById('atc-container');
-                container.innerHTML = controllers.length ? '' : '<p class="text-slate-500 col-span-2 text-center py-4">目前桃園機場無席位在線</p>';
+                container.innerHTML = controllers.length ? '' : '<p class="text-slate-500 col-span-2 text-center py-4">Current no ATC online</p>';
                 
                 controllers.forEach(atc => {
                     container.innerHTML += `
