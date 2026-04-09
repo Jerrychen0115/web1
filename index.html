@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VATROC | 中華民國虛擬航管組織</title>
+    <title>VATROC | 台北情報區即時航情</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
@@ -33,125 +33,190 @@
         </div>
         <div class="hidden md:flex gap-8 text-sm font-medium text-slate-400">
             <a href="index.html" class="text-white underline decoration-blue-500 underline-offset-8 decoration-2">首頁 / 即時航情</a>
-            <a href="staff.html" class="hover:text-white transition-colors">Controllers</a>
+            <a href="staff.html" class="hover:text-white transition-colors">管制員專區</a>
             <a href="#" class="hover:text-white transition-colors">飛行員資源</a>
         </div>
-        <button class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-full text-sm font-semibold transition-all">VATSIM 登入</button>
     </nav>
 
-    <main class="max-w-6xl mx-auto space-y-6">
-        
-        <section class="glass-card p-6 border-l-4 border-emerald-500">
-            <h3 class="font-bold mb-4 flex items-center gap-2 text-emerald-400 text-sm tracking-widest uppercase">
-                <span class="w-2 h-2 bg-emerald-500 rounded-full pulse"></span>
-                Real-time METAR (桃園國際機場)
-            </h3>
-            <div class="space-y-3">
-                <div class="metar-row">
-                    <span class="metar-icao">RCTP</span>
-                    <div id="metar-RCTP" class="metar-content italic text-slate-500">正在連線至氣象伺服器...</div>
+   <div class="max-w-7xl mx-auto space-y-6">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-black tracking-tighter text-white">VATROC MONITOR <span class="text-blue-500">RCTP</span></h1>
+                <p id="update-tag" class="text-xs text-slate-500 font-mono tracking-widest mt-1">CONNECTING TO VATSIM NETWORK...</p>
+            </div>
+            <div class="flex gap-2">
+                <div class="glass-card px-4 py-2 text-center">
+                    <span class="text-[10px] text-slate-500 block uppercase">ATC</span>
+                    <span id="atc-count" class="text-xl font-bold text-blue-400 font-mono">0</span>
                 </div>
-                <div class="metar-row">
-                    <span class="metar-icao">RCSS</span>
-                    <div id="metar-RCSS" class="metar-content italic text-slate-500">等待資料同步...</div>
+                <div class="glass-card px-4 py-2 text-center border-l-2 border-l-orange-500">
+                    <span class="text-[10px] text-slate-500 block uppercase">DEP</span>
+                    <span id="dep-count" class="text-xl font-bold text-orange-400 font-mono">0</span>
                 </div>
-                <div class="metar-row">
-                    <span class="metar-icao">RCKH</span>
-                    <div id="metar-RCKH" class="metar-content italic text-slate-500">等待資料同步...</div>
+                <div class="glass-card px-4 py-2 text-center border-l-2 border-l-emerald-500">
+                    <span class="text-[10px] text-slate-500 block uppercase">ARR</span>
+                    <span id="arr-count" class="text-xl font-bold text-emerald-400 font-mono">0</span>
                 </div>
             </div>
-        </section>
-
-       
+        </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 space-y-6">
-                <section class="glass-card p-6">
-                    <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
-                        <h2 class="text-lg font-semibold relative ml-4 status-online text-white">RCAA online controller</h2>
-                        <span id="update-tag" class="text-[10px] text-slate-500 font-mono tracking-tighter uppercase">Initializing...</span>
+            <section class="lg:col-span-2 glass-card p-5">
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 status-pulse ml-4">Active Controllers</h3>
+                <div id="atc-container" class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     </div>
-                    <div class="flex gap-4 mb-6">
-                        <div class="bg-slate-800/40 px-4 py-2 rounded-lg border border-slate-700">
-                            <span class="text-xs text-slate-400 block">桃園在線席位</span>
-                            <span id="atc-count" class="text-xl font-bold text-blue-400">0</span>
-                        </div>
-                        <div class="bg-slate-800/40 px-4 py-2 rounded-lg border border-slate-700">
-                            <span class="text-xs text-slate-400 block">全台在線飛機</span>
-                            <span id="pilot-count" class="text-xl font-bold text-emerald-400">0</span>
-                        </div>
+            </section>
+
+            <section class="glass-card p-5">
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Weather Briefing</h3>
+                <div id="metar-list" class="space-y-3">
                     </div>
-                    <div id="atc-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <p class="text-slate-500">載入中...</p>
-                    </div>
-                </section>
-            </div>
+            </section>
         </div>
-    </main>
+
+        <section class="glass-card overflow-hidden">
+            <div class="p-5 border-b border-white/5 flex justify-between items-center">
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Live Flight Board (RCTP Related)</h3>
+                <span class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded">AUTO-REFRESH: 30S</span>
+            </div>
+            <div class="overflow-x-auto custom-scroll">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-800/50 text-[10px] text-slate-400 uppercase font-bold">
+                        <tr>
+                            <th class="px-5 py-3">Callsign</th>
+                            <th class="px-5 py-3">Aircraft</th>
+                            <th class="px-5 py-3">Route</th>
+                            <th class="px-5 py-3">Altitude / GS</th>
+                            <th class="px-5 py-3">Status / ETA Est.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="flight-table-body" class="divide-y divide-white/5">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
 
     <script>
         const API_URL = 'https://data.vatsim.net/v3/vatsim-data.json';
-        // 修正 METAR API: 官方建議使用 vatsim 自己的 METAR 介面或航空氣象局，這裡使用 vatsim 較穩定
-        const METAR_API = "https://metar.vatsim.net/metar.php?id=";
+        const METAR_API = 'https://metar.vatsim.net/metar.php?id=';
+        const AIRPORTS = ['RCTP', 'RCSS', 'RCKH', 'RCMQ'];
+        const ATC_PREFIXES = ['RCTP', 'RCSS', 'RCKH', 'RCMQ', 'TPE_'];
 
         async function updateData() {
             try {
                 const res = await fetch(API_URL);
                 const data = await res.json();
-                
-                // 【核心修改】：這裡改為只抓 RCTP 開頭的呼號
-                const controllers = data.controllers.filter(c => c.callsign.startsWith('RCTP'));
-               
-                
-                const container = document.getElementById('atc-container');
-                container.innerHTML = controllers.length ? '' : '<p class="text-slate-500 col-span-2 text-center py-4">Current no ATC online</p>';
-                
-                controllers.forEach(atc => {
-                    container.innerHTML += `
-                        <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 hover:border-blue-500/50 transition-all">
-                            <div class="flex justify-between font-bold text-blue-400">
-                                <span>${atc.callsign}</span>
-                                <span>${atc.frequency}</span>
-                            </div>
-                            <div class="text-sm text-slate-300 mt-1">${atc.name}</div>
-                        </div>`;
+
+                // 1. Update ATC
+                const controllers = data.controllers.filter(c => ATC_PREFIXES.some(p => c.callsign.startsWith(p)));
+                document.getElementById('atc-container').innerHTML = controllers.map(atc => `
+                    <div class="flex justify-between items-center p-3 bg-slate-900/50 rounded-lg border border-white/5">
+                        <div>
+                            <div class="text-blue-400 font-bold font-mono text-sm">${atc.callsign}</div>
+                            <div class="text-[10px] text-slate-500">${atc.name}</div>
+                        </div>
+                        <div class="text-white font-mono text-sm">${atc.frequency}</div>
+                    </div>
+                `).join('') || '<div class="text-slate-600 text-sm">No controllers online</div>';
+                document.getElementById('atc-count').innerText = controllers.length;
+
+                // 2. Update Flights & Statistics
+                let depCount = 0, arrCount = 0;
+                let rctpFlights = [];
+
+                data.pilots.forEach(p => {
+                    if (p.flight_plan) {
+                        const isDep = p.flight_plan.departure === 'RCTP';
+                        const isArr = p.flight_plan.arrival === 'RCTP';
+                        if (isDep) depCount++;
+                        if (isArr) arrCount++;
+                        if (isDep || isArr) rctpFlights.push(p);
+                    }
                 });
 
-                // 更新計數
-                document.getElementById('atc-count').innerText = controllers.length;
-                document.getElementById('pilot-count').innerText = data.pilots.filter(p => p.callsign.startsWith('RC') || (p.latitude > 21 && p.latitude < 26)).length;
-                document.getElementById('update-tag').innerText = `最後更新: ${new Date().toLocaleTimeString()}`;
-            } catch (e) { 
-                console.error(e); 
-                document.getElementById('update-tag').innerText = "連線失敗";
+                document.getElementById('dep-count').innerText = depCount;
+                document.getElementById('arr-count').innerText = arrCount;
+
+                // 3. Render Flight Table with ETA Calculation
+                document.getElementById('flight-table-body').innerHTML = rctpFlights.map(p => {
+                    const isArr = p.flight_plan.arrival === 'RCTP';
+                    
+                    // 簡易 ETA 邏輯：基於 VATSIM 的 deptime 換算
+                    // 注意：這只是參考值，因為飛行員填寫的格式可能不統一
+                    let etaDisplay = "Calculating...";
+                    if (p.flight_plan.deptime && p.flight_plan.enroute_time) {
+                        const depH = parseInt(p.flight_plan.deptime.substring(0,2));
+                        const depM = parseInt(p.flight_plan.deptime.substring(2,4));
+                        const enrH = parseInt(p.flight_plan.enroute_time.substring(0,2));
+                        const enrM = parseInt(p.flight_plan.enroute_time.substring(2,4));
+                        
+                        let totalM = depM + enrM;
+                        let totalH = (depH + enrH + Math.floor(totalM/60)) % 24;
+                        totalM = (totalM % 60).toString().padStart(2, '0');
+                        etaDisplay = `${totalH.toString().padStart(2, '0')}:${totalM}Z`;
+                    }
+
+                    return `
+                        <tr class="text-sm hover:bg-white/[0.02] transition-colors">
+                            <td class="px-5 py-4">
+                                <div class="font-bold text-blue-400">${p.callsign}</div>
+                                <div class="text-[10px] text-slate-500 font-mono">${p.transponder} / SQ</div>
+                            </td>
+                            <td class="px-5 py-4">
+                                <div class="text-slate-200">${p.flight_plan.aircraft_short}</div>
+                                <div class="text-[10px] text-slate-500 uppercase">${p.flight_plan.revision_id} REV</div>
+                            </td>
+                            <td class="px-5 py-4">
+                                <div class="flex items-center gap-2 font-mono text-xs">
+                                    <span class="${!isArr ? 'text-orange-400' : 'text-slate-400'}">${p.flight_plan.departure}</span>
+                                    <span class="text-slate-600">→</span>
+                                    <span class="${isArr ? 'text-emerald-400' : 'text-slate-400'}">${p.flight_plan.arrival}</span>
+                                </div>
+                            </td>
+                            <td class="px-5 py-4 font-mono text-xs">
+                                <div class="text-slate-200">${p.altitude.toLocaleString()} FT</div>
+                                <div class="text-slate-500">${p.groundspeed} KTS</div>
+                            </td>
+                            <td class="px-5 py-4">
+                                <div class="text-[10px] ${isArr ? 'text-emerald-500' : 'text-orange-500'} font-bold uppercase mb-1">
+                                    ${isArr ? 'Arrival' : 'Departure'}
+                                </div>
+                                <div class="text-xs font-mono text-slate-300">ETA: ${etaDisplay}</div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('') || '<tr><td colspan="5" class="p-10 text-center text-slate-600">No active RCTP flights</td></tr>';
+
+                document.getElementById('update-tag').innerText = `SYSTEM LIVE: ${new Date().toLocaleTimeString('en-GB')}`;
+            } catch (e) { console.error(e); }
+        }
+
+        async function updateMetars() {
+            const container = document.getElementById('metar-list');
+            container.innerHTML = AIRPORTS.map(icao => `
+                <div class="p-3 bg-slate-900/30 rounded border border-white/5">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-xs font-bold text-blue-400">${icao}</span>
+                    </div>
+                    <div id="metar-${icao}" class="text-[10px] font-mono text-emerald-500/80 leading-relaxed italic">Loading...</div>
+                </div>
+            `).join('');
+
+            for (const icao of AIRPORTS) {
+                try {
+                    const res = await fetch(METAR_API + icao);
+                    const text = await res.text();
+                    document.getElementById(`metar-${icao}`).innerText = text.trim() || 'NO DATA';
+                } catch (e) { document.getElementById(`metar-${icao}`).innerText = 'FETCH ERROR'; }
             }
         }
 
-        async function updateMetar(icao) {
-            try {
-                const res = await fetch(`${METAR_API}${icao}`);
-                const text = await res.text();
-                const el = document.getElementById(`metar-${icao}`);
-                if (el) {
-                    el.innerText = text.trim() || "無資料";
-                    el.classList.remove('text-slate-500', 'italic');
-                }
-            } catch (e) { 
-                const el = document.getElementById(`metar-${icao}`);
-                if (el) el.innerText = "讀取失敗"; 
-            }
-        }
-
-        // 初始執行
-        updateData(); 
-        const airports = ['RCTP', 'RCSS', 'RCKH'];
-        airports.forEach(updateMetar);
-
-        // 定時更新
-        setInterval(updateData, 30000); // 30秒更新一次 ATC
-        setInterval(() => { 
-            airports.forEach(updateMetar);
-        }, 300000); // 5分鐘更新一次氣象
+        // Initial Calls
+        updateData();
+        updateMetars();
+        setInterval(updateData, 30000);
+        setInterval(updateMetars, 300000);
     </script>
 </body>
 </html>
