@@ -101,8 +101,7 @@
                 
                 // 【核心修改】：這裡改為只抓 RCTP 開頭的呼號
                 const controllers = data.controllers.filter(c => c.callsign.startsWith('RCTP'));
-                const controllers = data.controllers.filter(c => c.callsign.startsWith('RCSS'));
-                const controllers = data.controllers.filter(c => c.callsign.startsWith('RCKH'));
+               
                 
                 const container = document.getElementById('atc-container');
                 container.innerHTML = controllers.length ? '' : '<p class="text-slate-500 col-span-2 text-center py-4">Current no ATC online</p>';
