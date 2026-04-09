@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VATROC - 管制員團隊</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: radial-gradient(circle at top right, #1e293b, #0f172a); color: #f8fafc; min-height: 100vh; font-family: sans-serif; }
+        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <nav class="flex justify-between items-center mb-12 max-w-6xl mx-auto">
+        <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
+            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-xl text-white">RC</div>
+            <h1 class="text-2xl font-bold tracking-tight">VATROC</h1>
+        </div>
+        <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
+            <a href="main.html" class="hover:text-white transition">首頁/即時航情</a>
+            <a href="staff.html" class="text-white underline decoration-blue-500 underline-offset-4">管制員專區</a>
+            <a href="#" class="hover:text-white transition">飛行員資源</a>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto">
+        <div class="glass-card p-8">
+            <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                <span class="w-2 h-8 bg-blue-500 rounded-full"></span>
+                VATROC 管制員團隊名單
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b border-slate-700 text-slate-400 text-sm">
+                            <th class="pb-4 px-4">職位</th>
+                            <th class="pb-4 px-4">姓名</th>
+                            <th class="pb-4 px-4">等級</th>
+                            <th class="pb-4 px-4">備註</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-slate-300">
+                        <tr class="border-b border-white/5">
+                            <td class="py-4 px-4 text-blue-400 font-bold">Director (VATROC1)</td>
+                            <td class="py-4 px-4">王小明</td>
+                            <td class="py-4 px-4 text-xs font-mono">C3</td>
+                            <td class="py-4 px-4 text-sm text-slate-500">分部負責人</td>
+                        </tr>
+                        <tr class="border-b border-white/5">
+                            <td class="py-4 px-4 text-blue-400 font-bold">Training (VATROC5)</td>
+                            <td class="py-4 px-4">李大華</td>
+                            <td class="py-4 px-4 text-xs font-mono">I1</td>
+                            <td class="py-4 px-4 text-sm text-slate-500">訓練與考核</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
+
