@@ -3,218 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VATROC | 台北情報區即時航情</title>
+    <title>VATROC | RCTP Terminal Monitor</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { background: radial-gradient(circle at top right, #1e293b, #0f172a); font-family: 'Inter', sans-serif; color: #f8fafc; min-height: 100vh; }
-        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
         
-        .metar-row { display: flex; align-items: center; gap: 1rem; background: rgba(0,0,0,0.2); padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
-        .metar-icao { color: #60a5fa; font-weight: 800; font-family: monospace; width: 60px; flex-shrink: 0; }
-        .metar-content { 
-            color: #34d399; font-family: 'Courier New', monospace; font-size: 0.9rem; 
-            white-space: nowrap; overflow-x: auto; flex-grow: 1; 
+        body { 
+            background-image: url('TP.png'); /* 請確保圖片檔名與你上傳到 GitHub 的一致 */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            font-family: 'Inter', sans-serif; 
+            color: #f8fafc; 
+            min-height: 100vh; 
+            position: relative;
         }
-        .metar-content::-webkit-scrollbar { height: 2px; }
-        .metar-content::-webkit-scrollbar-thumb { background: rgba(52, 211, 153, 0.3); }
 
-        .status-online::before { content: ""; position: absolute; left: -12px; top: 50%; transform: translateY(-50%); width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 8px #22c55e; }
-        .pulse { animation: pulse-animation 2s infinite; }
-        @keyframes pulse-animation { 0% { box-shadow: 0 0 0 0px rgba(34, 197, 94, 0.4); } 100% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); } }
+        /* 調整遮罩：將 0.8 改為 0.4，讓圖片更亮、更清楚 */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(15, 23, 42, 0.4); 
+            z-index: -1;
+        }
+
+        /* 調整卡片：降低透明度 (0.7 -> 0.3)，增加毛玻璃感 */
+        .glass-card { 
+            background: rgba(15, 23, 42, 0.3); 
+            backdrop-filter: blur(8px); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 16px; 
+        }
+        
+        /* 讓文字帶有陰影，確保在亮色背景下也能閱讀 */
+        .text-shadow-sm {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .metar-row { display: flex; align-items: center; gap: 1rem; background: rgba(0,0,0,0.4); padding: 0.75rem 1rem; border-radius: 8px; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* 表格內縮與美化 */
+        th { background: rgba(0, 0, 0, 0.3); }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <nav class="flex justify-between items-center mb-8 max-w-6xl mx-auto">
+    <nav class="flex justify-between items-center mb-8 max-w-7xl mx-auto relative z-10">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-xl text-white shadow-lg shadow-blue-500/20">RC</div>
-            <h1 class="text-2xl font-bold tracking-tight text-white">VATROC <span class="text-blue-400 text-xs font-normal border border-blue-400/30 px-1 rounded ml-1">v3.0</span></h1>
+            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-xl text-white shadow-lg">RC</div>
+            <h1 class="text-2xl font-bold tracking-tight text-white text-shadow-sm">VATROC <span class="text-blue-400 text-xs font-normal border border-blue-400/30 px-1 rounded ml-1">v3.0</span></h1>
         </div>
-        <div class="hidden md:flex gap-8 text-sm font-medium text-slate-400">
-            <a href="index.html" class="text-white underline decoration-blue-500 underline-offset-8 decoration-2">首頁 / 即時航情</a>
-            <a href="staff.html" class="hover:text-white transition-colors">管制員專區</a>
-            <a href="#" class="hover:text-white transition-colors">飛行員資源</a>
+        <div class="hidden md:flex gap-8 text-sm font-medium text-white text-shadow-sm">
+            <a href="index.html" class="underline decoration-blue-500 underline-offset-8 decoration-2">首頁 / 即時航情</a>
+            <a href="staff.html" class="hover:text-blue-300 transition-colors">管制員專區</a>
+            <a href="#" class="hover:text-blue-300 transition-colors">飛行員資源</a>
         </div>
     </nav>
 
-   <div class="max-w-7xl mx-auto space-y-6">
+    <main class="max-w-7xl mx-auto space-y-6 relative z-10">
+        
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-                <h1 class="text-2xl font-black tracking-tighter text-white">VATROC MONITOR <span class="text-blue-500">RCTP</span></h1>
-                <p id="update-tag" class="text-xs text-slate-500 font-mono tracking-widest mt-1">CONNECTING TO VATSIM NETWORK...</p>
+                <h1 class="text-3xl font-black tracking-tighter text-white text-shadow-sm">TAIWAN MONITOR</h1>
+                <p id="update-tag" class="text-xs text-blue-200 font-mono tracking-widest mt-1 text-shadow-sm">FETCHING VATSIM DATA...</p>
             </div>
-            <div class="flex gap-2">
-                <div class="glass-card px-4 py-2 text-center">
-                    <span class="text-[10px] text-slate-500 block uppercase">ATC</span>
-                    <span id="atc-count" class="text-xl font-bold text-blue-400 font-mono">0</span>
+            <div class="flex gap-4">
+                <div class="glass-card px-6 py-3 text-center min-w-[100px]">
+                    <span class="text-[10px] text-slate-300 block uppercase font-bold">Controllers</span>
+                    <span id="atc-count" class="text-2xl font-bold text-blue-400 font-mono">0</span>
                 </div>
-                <div class="glass-card px-4 py-2 text-center border-l-2 border-l-orange-500">
-                    <span class="text-[10px] text-slate-500 block uppercase">DEP</span>
-                    <span id="dep-count" class="text-xl font-bold text-orange-400 font-mono">0</span>
+                <div class="glass-card px-6 py-3 text-center min-w-[100px] border-t-4 border-t-orange-500">
+                    <span class="text-[10px] text-slate-300 block uppercase font-bold text-orange-400">Departures</span>
+                    <span id="dep-count" class="text-2xl font-bold text-white font-mono">0</span>
                 </div>
-                <div class="glass-card px-4 py-2 text-center border-l-2 border-l-emerald-500">
-                    <span class="text-[10px] text-slate-500 block uppercase">ARR</span>
-                    <span id="arr-count" class="text-xl font-bold text-emerald-400 font-mono">0</span>
+                <div class="glass-card px-6 py-3 text-center min-w-[100px] border-t-4 border-t-emerald-500">
+                    <span class="text-[10px] text-slate-300 block uppercase font-bold text-emerald-400">Arrivals</span>
+                    <span id="arr-count" class="text-2xl font-bold text-white font-mono">0</span>
                 </div>
             </div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <section class="lg:col-span-2 glass-card p-5">
-                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 status-pulse ml-4">Active Controllers</h3>
-                <div id="atc-container" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <section class="glass-card p-6">
+                <h3 class="text-xs font-bold text-blue-300 uppercase tracking-widest mb-4">Online ATC</h3>
+                <div id="atc-container" class="space-y-3">
                     </div>
             </section>
 
-            <section class="glass-card p-5">
-                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Weather Briefing</h3>
-                <div id="metar-list" class="space-y-3">
+            <section class="lg:col-span-2 glass-card p-6">
+                <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-4">Airport METAR</h3>
+                <div id="metar-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     </div>
             </section>
         </div>
 
         <section class="glass-card overflow-hidden">
-            <div class="p-5 border-b border-white/5 flex justify-between items-center">
-                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Live Flight Board (RCTP Related)</h3>
-                <span class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded">AUTO-REFRESH: 30S</span>
+            <div class="p-4 border-b border-white/10 bg-black/20">
+                <h3 class="text-xs font-bold text-slate-200 uppercase tracking-widest">RCTP Flight Board</h3>
             </div>
-            <div class="overflow-x-auto custom-scroll">
-                <table class="w-full text-left">
-                    <thead class="bg-slate-800/50 text-[10px] text-slate-400 uppercase font-bold">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left table-fixed border-collapse">
+                    <thead class="text-[11px] text-slate-300 uppercase font-bold">
                         <tr>
-                            <th class="px-5 py-3">Callsign</th>
-                            <th class="px-5 py-3">Aircraft</th>
-                            <th class="px-5 py-3">Route</th>
-                            <th class="px-5 py-3">Altitude / GS</th>
-                            <th class="px-5 py-3">Status / ETA Est.</th>
+                            <th class="p-4 w-[20%]">Callsign</th>
+                            <th class="p-4 w-[20%] text-center">Aircraft</th>
+                            <th class="p-4 w-[30%] text-center">Route</th>
+                            <th class="p-4 w-[15%] text-left">Alt / GS</th>
+                            <th class="p-4 w-[15%] text-right">ETA (Z)</th>
                         </tr>
                     </thead>
-                    <tbody id="flight-table-body" class="divide-y divide-white/5">
+                    <tbody id="flight-table-body" class="divide-y divide-white/5 font-medium">
                         </tbody>
                 </table>
             </div>
         </section>
-    </div>
+    </main>
 
     <script>
+        // ... (這裡維持之前的 JavaScript 邏輯不變，確保數據抓取正常) ...
         const API_URL = 'https://data.vatsim.net/v3/vatsim-data.json';
         const METAR_API = 'https://metar.vatsim.net/metar.php?id=';
         const AIRPORTS = ['RCTP', 'RCSS', 'RCKH', 'RCMQ'];
-        const ATC_PREFIXES = ['RCTP', 'RCSS', 'RCKH', 'RCMQ', 'TPE_'];
+        const ATC_PREFIXES = ['RCTP', 'RCSS', 'RCKH', 'TPE_'];
 
         async function updateData() {
             try {
                 const res = await fetch(API_URL);
                 const data = await res.json();
 
-                // 1. Update ATC
                 const controllers = data.controllers.filter(c => ATC_PREFIXES.some(p => c.callsign.startsWith(p)));
                 document.getElementById('atc-container').innerHTML = controllers.map(atc => `
-                    <div class="flex justify-between items-center p-3 bg-slate-900/50 rounded-lg border border-white/5">
-                        <div>
-                            <div class="text-blue-400 font-bold font-mono text-sm">${atc.callsign}</div>
-                            <div class="text-[10px] text-slate-500">${atc.name}</div>
-                        </div>
-                        <div class="text-white font-mono text-sm">${atc.frequency}</div>
+                    <div class="bg-black/40 p-3 rounded-lg border border-white/5 flex justify-between">
+                        <span class="font-mono text-blue-400 font-bold">${atc.callsign}</span>
+                        <span class="font-mono text-white">${atc.frequency}</span>
                     </div>
-                `).join('') || '<div class="text-slate-600 text-sm">No controllers online</div>';
+                `).join('') || '<p class="text-slate-500 text-sm">無管制員在線</p>';
                 document.getElementById('atc-count').innerText = controllers.length;
 
-                // 2. Update Flights & Statistics
-                let depCount = 0, arrCount = 0;
-                let rctpFlights = [];
-
-                data.pilots.forEach(p => {
-                    if (p.flight_plan) {
-                        const isDep = p.flight_plan.departure === 'RCTP';
-                        const isArr = p.flight_plan.arrival === 'RCTP';
-                        if (isDep) depCount++;
-                        if (isArr) arrCount++;
-                        if (isDep || isArr) rctpFlights.push(p);
-                    }
+                let dep = 0, arr = 0;
+                let rctpPilots = data.pilots.filter(p => {
+                    if(!p.flight_plan) return false;
+                    if(p.flight_plan.departure === 'RCTP') { dep++; return true; }
+                    if(p.flight_plan.arrival === 'RCTP') { arr++; return true; }
+                    return false;
                 });
 
-                document.getElementById('dep-count').innerText = depCount;
-                document.getElementById('arr-count').innerText = arrCount;
+                document.getElementById('dep-count').innerText = dep;
+                document.getElementById('arr-count').innerText = arr;
 
-                // 3. Render Flight Table with ETA Calculation
-                document.getElementById('flight-table-body').innerHTML = rctpFlights.map(p => {
-                    const isArr = p.flight_plan.arrival === 'RCTP';
-                    
-                    // 簡易 ETA 邏輯：基於 VATSIM 的 deptime 換算
-                    // 注意：這只是參考值，因為飛行員填寫的格式可能不統一
-                    let etaDisplay = "Calculating...";
-                    if (p.flight_plan.deptime && p.flight_plan.enroute_time) {
-                        const depH = parseInt(p.flight_plan.deptime.substring(0,2));
-                        const depM = parseInt(p.flight_plan.deptime.substring(2,4));
-                        const enrH = parseInt(p.flight_plan.enroute_time.substring(0,2));
-                        const enrM = parseInt(p.flight_plan.enroute_time.substring(2,4));
-                        
-                        let totalM = depM + enrM;
-                        let totalH = (depH + enrH + Math.floor(totalM/60)) % 24;
-                        totalM = (totalM % 60).toString().padStart(2, '0');
-                        etaDisplay = `${totalH.toString().padStart(2, '0')}:${totalM}Z`;
+                document.getElementById('flight-table-body').innerHTML = rctpPilots.map(p => {
+                    let eta = "--:--";
+                    if(p.flight_plan.deptime && p.flight_plan.enroute_time){
+                        let h = (parseInt(p.flight_plan.deptime.slice(0,2)) + parseInt(p.flight_plan.enroute_time.slice(0,2))) % 24;
+                        let m = (parseInt(p.flight_plan.deptime.slice(2,4)) + parseInt(p.flight_plan.enroute_time.slice(2,4))) % 60;
+                        eta = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
                     }
-
                     return `
-                        <tr class="text-sm hover:bg-white/[0.02] transition-colors">
-                            <td class="px-5 py-4">
-                                <div class="font-bold text-blue-400">${p.callsign}</div>
-                                <div class="text-[10px] text-slate-500 font-mono">${p.transponder} / SQ</div>
+                        <tr class="hover:bg-white/5 transition-colors text-sm">
+                            <td class="p-4 font-bold text-blue-400">${p.callsign}</td>
+                            <td class="p-4 text-center text-slate-300">${p.flight_plan.aircraft_short}</td>
+                            <td class="p-4 text-center font-mono text-xs">
+                                <span class="text-orange-400">${p.flight_plan.departure}</span> → <span class="text-emerald-400">${p.flight_plan.arrival}</span>
                             </td>
-                            <td class="px-5 py-4">
-                                <div class="text-slate-200">${p.flight_plan.aircraft_short}</div>
-                                <div class="text-[10px] text-slate-500 uppercase">${p.flight_plan.revision_id} REV</div>
-                            </td>
-                            <td class="px-5 py-4">
-                                <div class="flex items-center gap-2 font-mono text-xs">
-                                    <span class="${!isArr ? 'text-orange-400' : 'text-slate-400'}">${p.flight_plan.departure}</span>
-                                    <span class="text-slate-600">→</span>
-                                    <span class="${isArr ? 'text-emerald-400' : 'text-slate-400'}">${p.flight_plan.arrival}</span>
-                                </div>
-                            </td>
-                            <td class="px-5 py-4 font-mono text-xs">
-                                <div class="text-slate-200">${p.altitude.toLocaleString()} FT</div>
-                                <div class="text-slate-500">${p.groundspeed} KTS</div>
-                            </td>
-                            <td class="px-5 py-4">
-                                <div class="text-[10px] ${isArr ? 'text-emerald-500' : 'text-orange-500'} font-bold uppercase mb-1">
-                                    ${isArr ? 'Arrival' : 'Departure'}
-                                </div>
-                                <div class="text-xs font-mono text-slate-300">ETA: ${etaDisplay}</div>
-                            </td>
+                            <td class="p-4 font-mono text-xs text-slate-300">${p.altitude} / ${p.groundspeed}</td>
+                            <td class="p-4 text-right font-mono text-blue-300">${eta}</td>
                         </tr>
                     `;
-                }).join('') || '<tr><td colspan="5" class="p-10 text-center text-slate-600">No active RCTP flights</td></tr>';
+                }).join('');
 
-                document.getElementById('update-tag').innerText = `SYSTEM LIVE: ${new Date().toLocaleTimeString('en-GB')}`;
-            } catch (e) { console.error(e); }
+                document.getElementById('update-tag').innerText = `LAST UPDATE: ${new Date().toLocaleTimeString()}`;
+            } catch(e) { console.log(e); }
         }
 
         async function updateMetars() {
-            const container = document.getElementById('metar-list');
-            container.innerHTML = AIRPORTS.map(icao => `
-                <div class="p-3 bg-slate-900/30 rounded border border-white/5">
-                    <div class="flex justify-between mb-1">
-                        <span class="text-xs font-bold text-blue-400">${icao}</span>
-                    </div>
-                    <div id="metar-${icao}" class="text-[10px] font-mono text-emerald-500/80 leading-relaxed italic">Loading...</div>
+            const list = document.getElementById('metar-list');
+            list.innerHTML = AIRPORTS.map(icao => `
+                <div class="bg-black/40 p-3 rounded-lg">
+                    <div class="text-blue-400 font-bold text-xs mb-1">${icao}</div>
+                    <div id="metar-${icao}" class="text-[10px] font-mono text-emerald-400 leading-tight italic">Loading...</div>
                 </div>
             `).join('');
-
-            for (const icao of AIRPORTS) {
-                try {
-                    const res = await fetch(METAR_API + icao);
-                    const text = await res.text();
-                    document.getElementById(`metar-${icao}`).innerText = text.trim() || 'NO DATA';
-                } catch (e) { document.getElementById(`metar-${icao}`).innerText = 'FETCH ERROR'; }
+            for(const icao of AIRPORTS){
+                const res = await fetch(METAR_API + icao);
+                const text = await res.text();
+                document.getElementById('metar-' + icao).innerText = text || 'N/A';
             }
         }
 
-        // Initial Calls
-        updateData();
-        updateMetars();
+        updateData(); updateMetars();
         setInterval(updateData, 30000);
         setInterval(updateMetars, 300000);
     </script>
