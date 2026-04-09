@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VATROC中華民國虛擬航管組織</title>
+    <title>VATROC | 中華民國虛擬航管組織</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
         
         body { 
-            background-image: url('TP.png'); /* 請確保圖片檔名與你上傳到 GitHub 的一致 */
+            /* 【修正】確認你的圖片檔名與你上傳到 GitHub 的一致 */
+            background-image: url('TP.png'); 
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -19,16 +20,14 @@
             position: relative;
         }
 
-        /* 調整遮罩：將 0.8 改為 0.4，讓圖片更亮、更清楚 */
         body::before {
             content: "";
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(15, 23, 42, 0.4); 
+            background-color: rgba(15, 23, 42, 0.4); /* 背景遮罩，讓圖片更亮 */
             z-index: -1;
         }
 
-        /* 調整卡片：降低透明度 (0.7 -> 0.3)，增加毛玻璃感 */
         .glass-card { 
             background: rgba(15, 23, 42, 0.3); 
             backdrop-filter: blur(8px); 
@@ -36,29 +35,35 @@
             border-radius: 16px; 
         }
         
-        /* 讓文字帶有陰影，確保在亮色背景下也能閱讀 */
         .text-shadow-sm {
             text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
 
         .metar-row { display: flex; align-items: center; gap: 1rem; background: rgba(0,0,0,0.4); padding: 0.75rem 1rem; border-radius: 8px; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
-
-        /* 表格內縮與美化 */
         th { background: rgba(0, 0, 0, 0.3); }
+
+        /* 新增：LOGO 樣式 */
+        .vatroc-logo {
+            height: 90px; /* 調整 LOGO 高度 */
+            width: auto;
+            object-fit: contain;
+        }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <nav class="flex justify-between items-center mb-8 max-w-7xl mx-auto relative z-10">
+    <nav class="flex justify-between items-center mb-10 max-w-7xl mx-auto relative z-10">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-xl text-white shadow-lg">RC</div>
-            <h1 class="text-2xl font-bold tracking-tight text-white text-shadow-sm">VATROC <span class="text-blue-400 text-xs font-normal border border-blue-400/30 px-1 rounded ml-1">v3.0</span></h1>
+            <img src="VATROC.png" alt="VATROC Logo" class="vatroc-logo">
         </div>
-        <div class="hidden md:flex gap-8 text-sm font-medium text-white text-shadow-sm">
+        <div class="hidden md:flex gap-8 text-sm font-medium text-white text-shadow-sm items-center">
             <a href="index.html" class="underline decoration-blue-500 underline-offset-8 decoration-2">Main Page</a>
-            <a href="staff.html" class="hover:text-blue-300 transition-colors">Controllers</a>
+            <a href="staff.html" class="hover:text-blue-300 transition-colors">ATC center</a>
             <a href="#" class="hover:text-blue-300 transition-colors">Pilot resources</a>
+        </div>
+        <div class="flex items-center">
+            <button class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-full text-sm font-semibold transition-all shadow-lg">VATSIM 登入</button>
         </div>
     </nav>
 
@@ -103,7 +108,7 @@
             <div class="p-4 border-b border-white/10 bg-black/20">
                 <h3 class="text-xs font-bold text-slate-200 uppercase tracking-widest">RCTP Flight Board</h3>
             </div>
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto custom-scroll">
                 <table class="w-full text-left table-fixed border-collapse">
                     <thead class="text-[11px] text-slate-300 uppercase font-bold">
                         <tr>
@@ -112,7 +117,7 @@
                             <th class="p-4 w-[30%] text-center">Route</th>
                             <th class="p-4 w-[15%] text-left">Alt / GS</th>
                             <th class="p-4 w-[15%] text-right">ETA (Z)</th>
-                        </tr>
+                    
                     </thead>
                     <tbody id="flight-table-body" class="divide-y divide-white/5 font-medium">
                         </tbody>
@@ -122,7 +127,6 @@
     </main>
 
     <script>
-        // ... (這裡維持之前的 JavaScript 邏輯不變，確保數據抓取正常) ...
         const API_URL = 'https://data.vatsim.net/v3/vatsim-data.json';
         const METAR_API = 'https://metar.vatsim.net/metar.php?id=';
         const AIRPORTS = ['RCTP', 'RCSS', 'RCKH', 'RCMQ'];
@@ -164,10 +168,10 @@
                         <tr class="hover:bg-white/5 transition-colors text-sm">
                             <td class="p-4 font-bold text-blue-400">${p.callsign}</td>
                             <td class="p-4 text-center text-slate-300">${p.flight_plan.aircraft_short}</td>
-                            <td class="p-4 text-center font-mono text-xs">
+                            <td class="p-4 text-center font-mono text-xs whitespace-nowrap">
                                 <span class="text-orange-400">${p.flight_plan.departure}</span> → <span class="text-emerald-400">${p.flight_plan.arrival}</span>
                             </td>
-                            <td class="p-4 font-mono text-xs text-slate-300">${p.altitude} / ${p.groundspeed}</td>
+                            <td class="p-4 font-mono text-xs text-slate-300 pl-4 whitespace-nowrap">${p.altitude} / ${p.groundspeed}</td>
                             <td class="p-4 text-right font-mono text-blue-300">${eta}</td>
                         </tr>
                     `;
@@ -186,9 +190,11 @@
                 </div>
             `).join('');
             for(const icao of AIRPORTS){
-                const res = await fetch(METAR_API + icao);
-                const text = await res.text();
-                document.getElementById('metar-' + icao).innerText = text || 'N/A';
+                try {
+                    const res = await fetch(METAR_API + icao);
+                    const text = await res.text();
+                    document.getElementById('metar-' + icao).innerText = text.trim() || 'N/A';
+                } catch (e) { document.getElementById('metar-' + icao).innerText = 'ERROR'; }
             }
         }
 
