@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=1280">
     <title>VATROC | ATC Application Form</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -16,81 +17,90 @@
             font-family: 'Inter', sans-serif; 
             color: #f8fafc; 
             min-height: 100vh; 
-            position: relative;
         }
 
+        /* 增加遮罩深度提升電腦端的文字對比度 */
         body::before {
             content: "";
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(15, 23, 42, 0.6); 
+            background-color: rgba(15, 23, 42, 0.5); 
             z-index: -1;
         }
 
         .glass-card { 
-            background: rgba(15, 23, 42, 0.4); 
+            background: rgba(15, 23, 42, 0.3); 
             backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 24px; 
+            border-radius: 20px; 
+            transition: transform 0.3s ease;
         }
 
+        /* 輸入框維持高品質質感 */
         input, textarea, select {
             background: rgba(255, 255, 255, 0.05) !important;
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
             color: white !important;
-            transition: all 0.3s ease;
+            font-size: 1rem;
         }
 
         input:focus, textarea:focus, select:focus {
             outline: none;
             border-color: #3b82f6 !important;
+            background: rgba(255, 255, 255, 0.1) !important;
             box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
         }
 
         label {
             display: block;
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             font-weight: 600;
             color: #93c5fd;
             margin-bottom: 0.5rem;
             text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* 針對電腦端的按鈕懸停特效 */
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
         }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <main class="max-w-2xl mx-auto py-12">
-        <div class="mb-8 text-center">
-            <h1 class="text-3xl font-black text-white mb-2">ATC APPLICATION</h1>
-            <p class="text-slate-400">成為台北飛航情報區的一份子</p>
-        </div>
+    <main class="max-w-4xl mx-auto py-10 relative z-10">
+        <header class="mb-12 text-center md:text-left">
+            <h1 class="text-4xl font-black tracking-tight text-white mb-3">ATC APPLICATION</h1>
+            <p class="text-blue-300 uppercase tracking-widest text-sm font-bold">成為台北飛航情報區的一份子</p>
+        </header>
 
         <form 
             action="https://docs.google.com/forms/d/e/1FAIpQLSeVwDpBDDgmc6QnRDLwD-Zzod9gq5Qrghiql8ee3r6V52P80A/formResponse" 
             method="POST" 
-            class="glass-card p-8 space-y-6">
+            class="glass-card p-8 md:p-12 space-y-8">
             
-            <div class="grid md:grid-cols-2 gap-6">
-                <div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                <div class="space-y-2">
                     <label>VATSIM ID</label>
                     <input type="text" name="entry.2098958242" required placeholder="e.g. 1000001" class="w-full px-4 py-3 rounded-xl">
                 </div>
 
-                <div>
+                <div class="space-y-2">
                     <label>English Name</label>
-                    <input type="text" name="entry.116189681" required placeholder="e.g. Wang Xiao-Ming" class="w-full px-4 py-3 rounded-xl">
+                    <input type="text" name="entry.116189681" required placeholder="e.g. Chen Tai-Ming" class="w-full px-4 py-3 rounded-xl">
                 </div>
-            </div>
 
-            <div class="grid md:grid-cols-2 gap-6">
-                <div>
+                <div class="space-y-2">
                     <label>Birth Year</label>
                     <input type="number" name="entry.1675845772" required placeholder="e.g. 2000" class="w-full px-4 py-3 rounded-xl">
                 </div>
 
-                <div>
+                <div class="space-y-2">
                     <label>Education Status</label>
-                    <select name="entry.2142229340" required class="w-full px-4 py-3 rounded-xl appearance-none bg-slate-900">
+                    <select name="entry.2142229340" required class="w-full px-4 py-3 rounded-xl appearance-none bg-slate-800">
                         <option value="" disabled selected>Select status</option>
                         <option value="Student">Student (學生)</option>
                         <option value="Employed">Employed (在職)</option>
@@ -99,26 +109,31 @@
                 </div>
             </div>
 
-            <div>
+            <div class="space-y-2">
                 <label>Flightsim Experience</label>
-                <textarea name="entry.980750356" rows="3" required placeholder="Your flight sim experience" class="w-full px-4 py-3 rounded-xl"></textarea>
+                <textarea name="entry.980750356" rows="4" required placeholder="請簡述您的飛行模擬經驗..." class="w-full px-4 py-3 rounded-xl"></textarea>
             </div>
 
-            <div>
+            <div class="space-y-2">
                 <label>Anything else you want to let us know?</label>
-                <textarea name="entry.1210745125" rows="3" placeholder="（Choose）" class="w-full px-4 py-3 rounded-xl"></textarea>
+                <textarea name="entry.1210745125" rows="4" placeholder="（選填）" class="w-full px-4 py-3 rounded-xl"></textarea>
             </div>
 
-            <div class="pt-4">
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-4 rounded-xl font-bold transition-all transform hover:scale-[1.02] shadow-xl">
-                    提交申請表單 SUBMIT
+            <div class="pt-6 flex flex-col md:flex-row items-center justify-between gap-6">
+                <p class="text-xs text-slate-400 max-w-xs text-center md:text-left">
+                    提交後即代表您同意 VATROC 的訓練規範與隱私條款。
+                </p>
+                <button type="submit" class="btn-submit w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white px-12 py-4 rounded-xl font-bold transition-all shadow-xl">
+                    提交申請 SUBMIT
                 </button>
             </div>
-
-            <div class="text-center">
-                <a href="joinatc.html" class="text-slate-500 text-sm hover:text-white transition-colors">← Return</a>
-            </div>
         </form>
+
+        <div class="mt-8 text-center">
+            <a href="joinatc.html" class="text-slate-500 hover:text-white transition-colors text-sm">
+                ← 返回招募資訊頁面 Back to info
+            </a>
+        </div>
     </main>
 
 </body>
