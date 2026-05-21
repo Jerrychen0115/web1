@@ -108,7 +108,7 @@
     </main>
 
     <script>
-        // 🎯 自動修正：直接咬住你最新產生的 Google 發布金鑰，並轉換為穩定快速的 CSV 串流格式
+        // 鎖定你發布出來的正確試算表金鑰
         const GOOGLE_PUBLISH_KEY = "2PACX-1vTQHAReEebnMznd65GlyzJner2QBgucSMxK72sxxaOo2YBHj93zKCvyrwSpo4ALDqpn-oL_6sE1xBo";
         const googleSheetCsvUrl = `https://docs.google.com/spreadsheets/d/e/${GOOGLE_PUBLISH_KEY}/pub?output=csv`;
         
@@ -135,7 +135,7 @@
             { name: "Shiang Hao Chiou", cid: "1367880", grade: "S2", position: "TWR" },
             { name: "Hugo Yeh", cid: "1576737", grade: "S1", position: "TWR OJT" },
             { name: "Louis Lu", cid: "1625128", grade: "S1", position: "TWR OJT" },
-            { name: "Brian Kan", cid: "1747753", rounded: true, grade: "S1", position: "TWR OJT" },
+            { name: "Brian Kan", cid: "1747753", grade: "S1", position: "TWR OJT" },
             { name: "Pei-en Lu", cid: "1462173", grade: "S1", position: "GND" },
             { name: "ChiLi Wu", cid: "1825030", grade: "S1", position: "GND" },
             { name: "Edward Chau", cid: "1458952", grade: "S1", position: "GND OJT" },
@@ -182,7 +182,7 @@
             }
         }
 
-        // CSV 字串解析安全工具（防止名字裡面有逗號造成噴裝）
+        // 🛠️ 重新優化的安全 CSV 欄位切割器
         function parseCSV(text) {
             let lines = text.split(/\r\n|\n/);
             return lines.map(line => {
@@ -289,7 +289,7 @@
             }
 
             try {
-                // 🕒 強制加上時間戳記戳破快取，確保每 15 秒抓到 Google 絕對即時的資料
+                // 🕒 加上時間戳防快取
                 const response = await fetch(googleSheetCsvUrl + `&_ts=${new Date().getTime()}`);
                 if (!response.ok) throw new Error("Cloud Sheets Fetch Failed");
                 
@@ -297,18 +297,21 @@
                 const parsedRows = parseCSV(csvText);
                 const cloudData = [];
 
+                // 🎯 【全面修正】拋棄舊有的 .v 解析，100% 改用純陣列索引存取 CSV 直流欄位
                 parsedRows.forEach((row, index) => {
-                    if (index === 0) return; // 跳過第一列欄位標題 (Name, CID, Grade, Position)
+                    if (index === 0) return; // 跳過標頭
                     
-                    const name = row[0] ? row[0].trim() : "";
-                    if (name === "" || name.toLowerCase() === "name") return;
+                    if (row && row.length >= 4) {
+                        const name = row[0] ? row[0].trim() : "";
+                        if (name === "" || name.toLowerCase() === "name") return;
 
-                    cloudData.push({
-                        name: name,
-                        cid: row[1] ? row[1].trim() : "",
-                        grade: row[2] ? row[2].trim() : "",
-                        position: row[3] ? row[3].trim() : ""
-                    });
+                        cloudData.push({
+                            name: name,
+                            cid: row[1] ? row[1].trim() : "",
+                            grade: row[2] ? row[2].trim() : "",
+                            position: row[3] ? row[3].trim() : ""
+                        });
+                    }
                 });
 
                 statusBadge.textContent = "LIVE CLOUD SYNCED";
@@ -316,7 +319,7 @@
                 renderRoster(cloudData, onlineAtcMap);
 
             } catch (error) {
-                console.warn("自動降級切換至預設清單:", error);
+                console.error("同步失敗原因:", error);
                 statusBadge.textContent = "OFFLINE ROSTER MODE";
                 statusBadge.className = "text-[10px] bg-amber-500/10 text-amber-400 px-2 py-1 rounded tracking-widest";
                 renderRoster(fallbackData, onlineAtcMap);
