@@ -13,43 +13,26 @@
         .vatroc-logo { height: 90px; width: auto; }
         th { background: rgba(0, 0, 0, 0.3); }
         .section-header { background: rgba(30, 41, 59, 0.6); }
-        .animate-pulse-light { animation: pulse-light 2s infinite ease-in-out; }
-        @keyframes pulse-light { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; transform: scale(1.03); } }
+        
+        /* 綠燈呼吸燈效果 */
+        @keyframes pulse-green {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .online-dot { animation: pulse-green 1.5s infinite; }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <nav class="flex justify-between items-center mb-12 max-w-7xl mx-auto relative z-10">
-        <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
-            <img src="VATROC.png" alt="VATROC Logo" class="vatroc-logo">
-        </div>
-        <div class="hidden md:flex gap-8 text-sm font-medium text-white items-center">
-            <a href="index.html" class="hover:text-blue-300">Main Page</a>
-            <a href="staff.html" class="text-white underline decoration-blue-500 underline-offset-8 decoration-2">ATC center</a>
-            <a href="https://ais.caa.gov.tw/eaip/" target="_blank" class="hover:text-blue-300">Pilot resources</a>
-            <a href="joinatc.html" class="text-white underline decoration-blue-500 underline-offset-8 decoration-2">ATC training / Visiting</a>
-        </div>
-    </nav>
-
     <main class="max-w-7xl mx-auto relative z-10">
-        <div class="glass-card p-6 md:p-8 overflow-hidden">
-            <div class="flex justify-between items-center mb-8 border-b border-white/5 pb-4">
-                <h2 class="text-3xl font-black text-white flex items-center gap-3">
-                    <span class="w-2 h-8 bg-blue-500 rounded-full"></span> VATROC ATC Roster
-                </h2>
-                <div class="flex flex-col items-end gap-1">
-                    <span id="next-sync" class="text-[9px] text-slate-400 font-mono">Syncing...</span>
-                    <span id="sync-status" class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded">LOADING</span>
-                </div>
-            </div>
-            
-            <table class="w-full text-left table-fixed border-collapse">
+        <div class="glass-card p-6 md:p-8">
+            <h2 class="text-3xl font-black text-white mb-8">VATROC ATC Roster</h2>
+            <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="text-[11px] text-slate-300 uppercase font-bold">
-                        <th class="p-4 w-[30%] text-center">Name</th>
-                        <th class="p-4 w-[20%] text-center">CID</th>
-                        <th class="p-4 w-[20%] text-center">Grade</th>
-                        <th class="p-4 w-[25%] text-center">Position</th>
+                        <th class="p-4 w-[40%]">Name</th>
+                        <th class="p-4 w-[20%]">CID</th>
+                        <th class="p-4 w-[40%]">Status</th>
                     </tr>
                 </thead>
                 <tbody id="roster-table-body" class="divide-y divide-white/5 font-medium text-sm"></tbody>
@@ -58,48 +41,45 @@
     </main>
 
     <script>
-        // 🚨 請確認這裡放入的是你「發布到網路 -> 工作表1 -> CSV」後產生的新網址
-        const BASE_GOOGLE_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTQHAreEebnMznd65GIyzJner2QBguCsMxK72sxxaOo2YBHj93zKCvvyrwSpo4ALDqpn-oL_6sE1xBo/pub?gid=0&single=true&output=csv";
-        
-        const categories = [
-            { key: "CTR", title: "Area Control Center (CTR)" },
-            { key: "APP", title: "Approach Control (APP)" },
-            { key: "TWR", title: "Tower Control (TWR)" },
-            { key: "GND", title: "Ground Control (GND)" },
-            { key: "DEL", title: "Delivery Control (DEL)" }
-        ];
+        const GOOGLE_CSV_URL = "你的正確CSV網址在此"; // 請務必填入你的網址
+        const VATSIM_API = "https://data.vatsim.net/v3/vatsim-data.json";
 
-        async function doSync() {
-            const statusBadge = document.getElementById('sync-status');
-            try {
-                // 強制跳過快取
-                const response = await fetch(`${BASE_GOOGLE_URL}&_cb=${Date.now()}`, { cache: 'no-store' });
-                const csvText = await response.text();
-                
-                if (csvText.includes("<html")) throw new Error("Waiting for Google Cache...");
+        async function syncRoster() {
+            // 1. 同時獲取 Google 表格與 VATSIM 數據
+            const [csvRes, vatsimRes] = await Promise.all([
+                fetch(`${GOOGLE_CSV_URL}&_cb=${Date.now()}`, { cache: 'no-store' }),
+                fetch(VATSIM_API)
+            ]);
 
-                const rows = csvText.split('\n').map(row => row.split(',').map(cell => cell.replace(/^"|"$/g, '').trim()));
-                const tableBody = document.getElementById('roster-table-body');
-                tableBody.innerHTML = '';
+            const csvText = await csvRes.text();
+            const vatsimData = await vatsimRes.json();
+            
+            // 將所有線上管制員 CID 存入 Set 加速比對
+            const onlineCids = new Set(vatsimData.controllers.map(c => String(c.cid)));
 
-                categories.forEach(cat => {
-                    const filtered = rows.filter(r => r.length >= 4 && r[3].toUpperCase().includes(cat.key));
-                    if (filtered.length > 0) {
-                        tableBody.innerHTML += `<tr class="section-header"><td colspan="4" class="p-3 text-xs font-bold text-slate-200 uppercase pl-4">${cat.title}</td></tr>`;
-                        filtered.forEach(r => {
-                            tableBody.innerHTML += `<tr><td class="p-4 pl-6 text-blue-400 font-bold">${r[0]}</td><td class="p-4 text-center text-slate-300 font-mono">${r[1]}</td><td class="p-4 text-center">${r[2]}</td><td class="p-4 text-center">${r[3]}</td></tr>`;
-                        });
-                    }
-                });
-                statusBadge.textContent = "SYNCED";
-                statusBadge.className = "text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded";
-            } catch (e) {
-                statusBadge.textContent = "WAITING FOR SYNC...";
-            }
+            // 解析表格
+            const rows = csvText.split('\n').map(row => row.split(',').map(c => c.replace(/^"|"$/g, '').trim()));
+            const tableBody = document.getElementById('roster-table-body');
+            tableBody.innerHTML = '';
+
+            rows.forEach(r => {
+                if (r.length >= 2 && /^\d+$/.test(r[1])) {
+                    const isOnline = onlineCids.has(r[1]);
+                    tableBody.innerHTML += `
+                        <tr class="hover:bg-white/5">
+                            <td class="p-4 font-bold text-blue-400">
+                                ${r[0]} 
+                                ${isOnline ? '<span class="ml-2 bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px] uppercase font-black online-dot">● ONLINE</span>' : ''}
+                            </td>
+                            <td class="p-4 font-mono text-slate-400">${r[1]}</td>
+                            <td class="p-4 text-slate-300">${r[3] || ''}</td>
+                        </tr>`;
+                }
+            });
         }
 
-        setInterval(doSync, 15000);
-        doSync();
+        setInterval(syncRoster, 30000); // 每 30 秒更新一次
+        syncRoster();
     </script>
 </body>
-</html>Body.innerHTML += `<tr><td class="p-4 pl-6 text-blue
+</html>
