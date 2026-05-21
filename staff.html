@@ -108,20 +108,10 @@
     </main>
 
     <script>
-        // 🎯 自動校正連結：確保結尾絕對是正確的 csv 輸出格式
-        let rawUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTQHAreEebnMznd65GIyzJner2QBguCsMxK72sxxaOo2YBHj93zKCvvyrwSpo4ALDqpn-oL_6sE1xBo/pubhtml";
-        if (rawUrl.endsWith("pubhtml")) {
-            rawUrl = rawUrl.replace("/pubhtml", "/pub?output=csv");
-        }
-        const GOOGLE_CSV_URL = rawUrl;
+        // 📢 【請把下方雙引號內的網址，替換成你剛剛選單改成「工作表1」與「CSV」後生成的新網址！】
+        const GOOGLE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTQHAreEebnMznd65GIyzJner2QBguCsMxK72sxxaOo2YBHj93zKCvvyrwSpo4ALDqpn-oL_6sE1xBo/pub?gid=0&single=true&output=csv";
         
         const VATSIM_DATA_URL = "https://data.vatsim.net/v3/vatsim-data.json";
-
-        const fallbackData = [
-            { name: "Ming Lee", cid: "811204", grade: "I3", position: "CTR" },
-            { name: "Tai Hsia", cid: "811536", grade: "I1", position: "CTR" },
-            { name: "Chung Hsien Kao", cid: "839726", grade: "I1", position: "CTR" }
-        ];
 
         const categories = [
             { key: "CTR", title: "Area Control Center (CTR)" },
@@ -235,24 +225,11 @@
             const statusBadge = document.getElementById('sync-status');
             const onlineAtcMap = await fetchVatsimControllers();
             
-            if (window.location.protocol === 'file:') {
-                statusBadge.textContent = "OFFLINE ROSTER MODE";
-                statusBadge.className = "text-[10px] bg-amber-500/10 text-amber-400 px-2 py-1 rounded tracking-widest";
-                renderRoster(fallbackData, onlineAtcMap);
-                return;
-            }
-
             try {
                 const response = await fetch(GOOGLE_CSV_URL);
                 if (!response.ok) throw new Error("Fetch Error");
                 
                 const csvText = await response.text();
-                
-                // 🧠 防卡死安全鎖：如果發現抓到的是網頁 HTML 代碼而不是 CSV，立刻報錯切換，不卡在 LOADING
-                if (csvText.includes("<!DOCTYPE") || csvText.includes("<html")) {
-                    throw new Error("Google output format is HTML, expected CSV.");
-                }
-
                 const parsedRows = parseCSV(csvText);
                 const cloudData = [];
 
@@ -263,6 +240,7 @@
                         let grade = row[2] ? row[2].trim() : "";
                         let position = row[3] ? row[3].trim() : "";
 
+                        // 有效資料過濾
                         if (name !== "" && /^\d+$/.test(cid)) {
                             cloudData.push({ name, cid, grade, position });
                         }
@@ -277,46 +255,9 @@
                     throw new Error("No valid rows found");
                 }
             } catch (error) {
-                console.error("解析失敗，啟用保底數據：", error);
-                statusBadge.textContent = "LIVE CLOUD SYNCED (LOCAL CACHE)";
-                statusBadge.className = "text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded tracking-widest";
-                
-                // 讀取你在試算表中輸入的完整名單作為保底
-                const localData = [
-                    { name: "Ming Lee", cid: "811204", grade: "I3", position: "CTR" },
-                    { name: "Tai Hsia", cid: "811536", grade: "I1", position: "CTR" },
-                    { name: "Chung Hsien Kao", cid: "839726", grade: "I1", position: "CTR" },
-                    { name: "Chi-cheng Liu", cid: "995723", grade: "I1", position: "CTR" },
-                    { name: "Jing-Wei Li", cid: "1294668", grade: "I1", position: "CTR" },
-                    { name: "Pei-Cheng Chung", cid: "1475432", grade: "C3", position: "CTR" },
-                    { name: "Colin Lee", cid: "977364", grade: "C1", position: "CTR" },
-                    { name: "Tzu-Hsiang Chao", cid: "1065234", grade: "C1", position: "CTR" },
-                    { name: "Hung-En Chin", cid: "1291996", grade: "C1", position: "CTR" },
-                    { name: "Chih Hao Ke", cid: "1297252", grade: "C1", position: "CTR" },
-                    { name: "Yan Yu Dai", cid: "1368745", grade: "C1", position: "CTR" },
-                    { name: "PoChun Wu", cid: "1464608", grade: "C1", position: "CTR" },
-                    { name: "Glenn Feng", cid: "1495843", grade: "C1", position: "CTR" },
-                    { name: "Charlotte Lee", cid: "1275222", grade: "S3", position: "APP" },
-                    { name: "K. C. Yen", cid: "1291782", grade: "S2", position: "APP OJT" },
-                    { name: "Chia-Hao Chuang", cid: "1326434", grade: "S2", position: "APP OJT" },
-                    { name: "Jerry Chen", cid: "1654972", grade: "S2", position: "APP OJT" },
-                    { name: "Shiang Hao Chiou", cid: "1367880", grade: "S2", position: "TWR" },
-                    { name: "Hugo Yeh", cid: "1576737", grade: "S1", position: "TWR OJT" },
-                    { name: "Louis Lu", cid: "1625128", grade: "S1", position: "TWR OJT" },
-                    { name: "Brian Kan", cid: "1747753", grade: "S1", position: "TWR OJT" },
-                    { name: "Pei-en Lu", cid: "1462173", grade: "S1", position: "GND" },
-                    { name: "ChiLi Wu", cid: "1825030", grade: "S1", position: "GND" },
-                    { name: "Edward Chau", cid: "1458952", grade: "S1", position: "GND OJT" },
-                    { name: "Gabriel Chang", cid: "1791020", grade: "S1", position: "GND OJT" },
-                    { name: "ChuHan Chang", cid: "1752512", grade: "S1", position: "DEL" },
-                    { name: "Zhixiang Hong", cid: "1316375", grade: "S1", position: "DEL OJT" },
-                    { name: "Y. C. Chen", cid: "1462414", grade: "S1", position: "DEL OJT" },
-                    { name: "Ching Hsiang Chang", cid: "1477356", grade: "S1", position: "DEL OJT" },
-                    { name: "Jonathan Liao", cid: "1542314", grade: "S1", position: "DEL OJT" },
-                    { name: "Morris", cid: "1738199", grade: "S1", position: "DEL OJT" },
-                    { name: "JUN-RUI HO", cid: "1971278", grade: "S1", position: "DEL OJT" }
-                ];
-                renderRoster(localData, onlineAtcMap);
+                console.error("同步失敗:", error);
+                statusBadge.textContent = "SYNC ERROR (CHECK URL)";
+                statusBadge.className = "text-[10px] bg-red-500/10 text-red-400 px-2 py-1 rounded tracking-widest";
             }
         }
 
