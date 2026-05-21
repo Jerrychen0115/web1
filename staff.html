@@ -108,9 +108,8 @@
     </main>
 
     <script>
-        // 🎯 核心修正：使用與你發布畫面完全一致的官方標準 CSV 下載流網址，拔除任何會引發 404 的贅字參數
-        const GOOGLE_PUBLISH_KEY = "2PACX-1vTQHAReEebnMznd65GlyzJner2QBgucSMxK72sxxaOo2YBHj93zKCvyrwSpo4ALDqpn-oL_6sE1xBo";
-        const googleSheetCsvUrl = `https://docs.google.com/spreadsheets/d/e/${GOOGLE_PUBLISH_KEY}/pub?output=csv`;
+        // 🎯 完美綁定你提供的正確 Google CSV 發布網址
+        const GOOGLE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTQHAreEebnMznd65GIyzJner2QBguCsMxK72sxxaOo2YBHj93zKCvvyrwSpo4ALDqpn-oL_6sE1xBo/pub?output=csv";
         
         const VATSIM_DATA_URL = "https://data.vatsim.net/v3/vatsim-data.json";
 
@@ -138,7 +137,7 @@
             { name: "Brian Kan", cid: "1747753", grade: "S1", position: "TWR OJT" },
             { name: "Pei-en Lu", cid: "1462173", grade: "S1", position: "GND" },
             { name: "ChiLi Wu", cid: "1825030", grade: "S1", position: "GND" },
-            { name: "Edward Chau", cid: "1458952", grade: "S1", position: "GND OJT" },
+            { name: "Edward Chau", cid: "1458952", grade: "S1", position: "GND OJT" }, // 已修正 py -> grade 欄位
             { name: "Gabriel Chang", cid: "1791020", grade: "S1", position: "GND OJT" },
             { name: "ChuHan Chang", cid: "1752512", grade: "S1", position: "DEL" },
             { name: "Zhixiang Hong", cid: "1316375", grade: "S1", position: "DEL OJT" },
@@ -288,8 +287,8 @@
             }
 
             try {
-                // 🚀 完全移除會觸發 404 的快取後綴字，讓 Google 認得這串純淨的發布請求網址
-                const response = await fetch(googleSheetCsvUrl);
+                // 🕒 加入防快取機制，每次背景定時刷新都會抓到最新雲端試算表
+                const response = await fetch(GOOGLE_CSV_URL + `&_ts=${new Date().getTime()}`);
                 if (!response.ok) throw new Error("Cloud Sheets Fetch Failed");
                 
                 const csvText = await response.text();
@@ -297,18 +296,17 @@
                 const cloudData = [];
 
                 parsedRows.forEach((row, index) => {
-                    if (index === 0) return; // 跳過 CSV 標頭
+                    if (index === 0) return; // 跳過標頭
                     
                     if (row && row.length >= 4) {
-                        const name = row[0] ? row[0].trim() : "";
+                        let name = row[0] ? row[0].replace(/^"|"$/g, '').trim() : "";
                         if (name === "" || name.toLowerCase() === "name") return;
 
-                        cloudData.push({
-                            name: name,
-                            cid: row[1] ? row[1].trim() : "",
-                            grade: row[2] ? row[2].trim() : "",
-                            position: row[3] ? row[3].trim() : ""
-                        });
+                        let cid = row[1] ? row[1].replace(/^"|"$/g, '').trim() : "";
+                        let grade = row[2] ? row[2].replace(/^"|"$/g, '').trim() : "";
+                        let position = row[3] ? row[3].replace(/^"|"$/g, '').trim() : "";
+
+                        cloudData.push({ name, cid, grade, position });
                     }
                 });
 
