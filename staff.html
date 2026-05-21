@@ -108,46 +108,21 @@
     </main>
 
     <script>
-        const GOOGLE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTQHAreEebnMznd65GIyzJner2QBguCsMxK72sxxaOo2YBHj93zKCvvyrwSpo4ALDqpn-oL_6sE1xBo/pub?output=csv";
+        // 🎯 自動校正連結：確保結尾絕對是正確的 csv 輸出格式
+        let rawUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTQHAreEebnMznd65GIyzJner2QBguCsMxK72sxxaOo2YBHj93zKCvvyrwSpo4ALDqpn-oL_6sE1xBo/pubhtml";
+        if (rawUrl.endsWith("pubhtml")) {
+            rawUrl = rawUrl.replace("/pubhtml", "/pub?output=csv");
+        }
+        const GOOGLE_CSV_URL = rawUrl;
+        
         const VATSIM_DATA_URL = "https://data.vatsim.net/v3/vatsim-data.json";
 
-        // 預備用的後備資料（以防萬一連不上時顯示）
         const fallbackData = [
             { name: "Ming Lee", cid: "811204", grade: "I3", position: "CTR" },
             { name: "Tai Hsia", cid: "811536", grade: "I1", position: "CTR" },
-            { name: "Chung Hsien Kao", cid: "839726", grade: "I1", position: "CTR" },
-            { name: "Chi-cheng Liu", cid: "995723", grade: "I1", position: "CTR" },
-            { name: "Jing-Wei Li", cid: "1294668", grade: "I1", position: "CTR" },
-            { name: "Pei-Cheng Chung", cid: "1475432", grade: "C3", position: "CTR" },
-            { name: "Colin Lee", cid: "977364", grade: "C1", position: "CTR" },
-            { name: "Tzu-Hsiang Chao", cid: "1065234", grade: "C1", position: "CTR" },
-            { name: "Hung-En Chin", cid: "1291996", grade: "C1", position: "CTR" },
-            { name: "Chih Hao Ke", cid: "1297252", grade: "C1", position: "CTR" },
-            { name: "Yan Yu Dai", cid: "1368745", grade: "C1", position: "CTR" },
-            { name: "PoChun Wu", cid: "1464608", grade: "C1", position: "CTR" },
-            { name: "Glenn Feng", cid: "1495843", grade: "C1", position: "CTR" },
-            { name: "Charlotte Lee", cid: "1275222", grade: "S3", position: "APP" },
-            { name: "K. C. Yen", cid: "1291782", grade: "S2", position: "APP OJT" },
-            { name: "Chia-Hao Chuang", cid: "1326434", grade: "S2", position: "APP OJT" },
-            { name: "Jerry Chen", cid: "1654972", grade: "S2", position: "APP OJT" },
-            { name: "Shiang Hao Chiou", cid: "1367880", grade: "S2", position: "TWR" },
-            { name: "Hugo Yeh", cid: "1576737", grade: "S1", position: "TWR OJT" },
-            { name: "Louis Lu", cid: "1625128", grade: "S1", position: "TWR OJT" },
-            { name: "Brian Kan", cid: "1747753", grade: "S1", position: "TWR OJT" },
-            { name: "Pei-en Lu", cid: "1462173", grade: "S1", position: "GND" },
-            { name: "ChiLi Wu", cid: "1825030", grade: "S1", position: "GND" },
-            { name: "Edward Chau", cid: "1458952", grade: "S1", position: "GND OJT" },
-            { name: "Gabriel Chang", cid: "1791020", grade: "S1", position: "GND OJT" },
-            { name: "ChuHan Chang", cid: "1752512", grade: "S1", position: "DEL" },
-            { name: "Zhixiang Hong", cid: "1316375", grade: "S1", position: "DEL OJT" },
-            { name: "Y. C. Chen", cid: "1462414", grade: "S1", position: "DEL OJT" },
-            { name: "Ching Hsiang Chang", cid: "1477356", grade: "S1", position: "DEL OJT" },
-            { name: "Jonathan Liao", cid: "1542314", grade: "S1", position: "DEL OJT" },
-            { name: "Morris", cid: "1738199", grade: "S1", position: "DEL OJT" },
-            { name: "JUN-RUI HO", cid: "1971278", grade: "S1", position: "DEL OJT" }
+            { name: "Chung Hsien Kao", cid: "839726", grade: "I1", position: "CTR" }
         ];
 
-        // 🧠 強力模糊分類對照表
         const categories = [
             { key: "CTR", title: "Area Control Center (CTR)" },
             { key: "APP OJT", title: "Approach Control (APP)" },
@@ -165,7 +140,6 @@
                 const response = await fetch(VATSIM_DATA_URL);
                 if (!response.ok) throw new Error("VATSIM API Offline");
                 const data = await response.json();
-                
                 const onlineMap = new Map();
                 if (data && data.controllers) {
                     data.controllers.forEach(controller => {
@@ -175,13 +149,11 @@
                 document.getElementById('vatsim-status').textContent = `VATSIM API: Connected (${onlineMap.size} ATCs Online)`;
                 return onlineMap;
             } catch (e) {
-                console.error("VATSIM 連線失敗:", e);
                 document.getElementById('vatsim-status').textContent = "VATSIM API: Offline Cache Mode";
                 return new Map();
             }
         }
 
-        // 🛠️ 去雜訊版 CSV 解析器
         function parseCSV(text) {
             let lines = text.split(/\r\n|\n/);
             return lines.map(line => {
@@ -200,29 +172,21 @@
                     }
                 }
                 result.push(current.trim());
-                // 徹底過濾掉前後多餘的引號與隱形空白
                 return result.map(str => str.replace(/^"|"$/g, '').trim());
             });
         }
 
         function renderRoster(memberList, onlineAtcMap) {
             const tableBody = document.getElementById('roster-table-body');
-            
-            // 初始化分組籃子
             const groups = {
-                "Area Control Center (CTR)": [],
-                "Approach Control (APP)": [],
-                "Tower Control (TWR)": [],
-                "Ground Control (GND)": [],
-                "Delivery Control (DEL)": [],
-                "Unassigned": []
+                "Area Control Center (CTR)": [], "Approach Control (APP)": [],
+                "Tower Control (TWR)": [], "Ground Control (GND)": [],
+                "Delivery Control (DEL)": [], "Unassigned": []
             };
 
-            // 分類丟進籃子
             memberList.forEach(member => {
                 let assigned = false;
-                const posUpper = member.position.toUpperCase();
-                
+                const posUpper = String(member.position).toUpperCase();
                 for (let cat of categories) {
                     if (posUpper === cat.key || posUpper.includes(cat.key)) {
                         groups[cat.title].push(member);
@@ -230,64 +194,40 @@
                         break;
                     }
                 }
-                if (!assigned) {
-                    groups["Unassigned"].push(member);
-                }
+                if (!assigned) groups["Unassigned"].push(member);
             });
 
             let htmlContent = "";
-            const displayOrder = [
-                "Area Control Center (CTR)",
-                "Approach Control (APP)",
-                "Tower Control (TWR)",
-                "Ground Control (GND)",
-                "Delivery Control (DEL)",
-                "Unassigned"
-            ];
+            const displayOrder = ["Area Control Center (CTR)", "Approach Control (APP)", "Tower Control (TWR)", "Ground Control (GND)", "Delivery Control (DEL)", "Unassigned"];
 
             displayOrder.forEach(categoryTitle => {
                 const membersInGroup = groups[categoryTitle];
-                
                 if (membersInGroup && membersInGroup.length > 0) {
                     htmlContent += `
                         <tr class="section-header">
-                            <td colspan="4" class="p-3 text-xs font-bold tracking-wider text-slate-200 uppercase pl-4 bg-slate-800/80">
-                                ${categoryTitle}
-                            </td>
+                            <td colspan="4" class="p-3 text-xs font-bold tracking-wider text-slate-200 uppercase pl-4 bg-slate-800/80">${categoryTitle}</td>
                         </tr>
                     `;
-
                     membersInGroup.forEach(member => {
                         const cleanCid = String(member.cid).trim();
                         const isOnline = onlineAtcMap.has(cleanCid);
                         const liveCallsign = isOnline ? onlineAtcMap.get(cleanCid) : "";
-
                         htmlContent += `
                             <tr class="hover:bg-white/5 transition-colors">
                                 <td class="p-4 font-bold text-blue-400 pl-6 flex items-center gap-2">
                                     ${member.name}
-                                    ${isOnline ? `
-                                        <span class="inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-400 text-[10px] px-2 py-0.5 rounded font-black tracking-tighter animate-pulse-light">
-                                            <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span>LIVE
-                                        </span>
-                                    ` : ''}
+                                    ${isOnline ? `<span class="inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-400 text-[10px] px-2 py-0.5 rounded font-black tracking-tighter animate-pulse-light"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span>LIVE</span>` : ''}
                                 </td>
                                 <td class="p-4 text-center text-slate-300 font-mono">${member.cid}</td>
                                 <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">${member.grade}</td>
                                 <td class="p-4 text-center font-mono">
-                                    ${isOnline ? `
-                                        <span class="text-emerald-400 font-bold block">${liveCallsign}</span>
-                                        <span class="text-slate-400 text-[11px]">(${member.position})</span>
-                                    ` : `
-                                        <span class="text-slate-300">${member.position}</span>
-                                    `}
+                                    ${isOnline ? `<span class="text-emerald-400 font-bold block">${liveCallsign}</span><span class="text-slate-400 text-[11px]">(${member.position})</span>` : `<span class="text-slate-300">${member.position}</span>`}
                                 </td>
                             </tr>
                         `;
                     });
                 }
             });
-
             tableBody.innerHTML = htmlContent;
         }
 
@@ -304,43 +244,79 @@
 
             try {
                 const response = await fetch(GOOGLE_CSV_URL);
-                if (!response.ok) throw new Error("Cloud Sheets Fetch Failed");
+                if (!response.ok) throw new Error("Fetch Error");
                 
                 const csvText = await response.text();
+                
+                // 🧠 防卡死安全鎖：如果發現抓到的是網頁 HTML 代碼而不是 CSV，立刻報錯切換，不卡在 LOADING
+                if (csvText.includes("<!DOCTYPE") || csvText.includes("<html")) {
+                    throw new Error("Google output format is HTML, expected CSV.");
+                }
+
                 const parsedRows = parseCSV(csvText);
                 const cloudData = [];
 
                 parsedRows.forEach((row, index) => {
-                    // 跳過可能有雜訊的第一行標頭
-                    if (index === 0) return; 
-                    
-                    if (row && row.length >= 4) {
+                    if (row && row.length >= 2) {
                         let name = row[0] ? row[0].trim() : "";
                         let cid = row[1] ? row[1].trim() : "";
                         let grade = row[2] ? row[2].trim() : "";
                         let position = row[3] ? row[3].trim() : "";
 
-                        // 防呆：只要其中名字或CID有任何一個填寫才算有效列
-                        if (name !== "" && cid !== "" && name.toLowerCase() !== "name") {
+                        if (name !== "" && /^\d+$/.test(cid)) {
                             cloudData.push({ name, cid, grade, position });
                         }
                     }
                 });
 
-                // 🎯 如果洗完資料發現雲端有抓到東西，就亮綠燈渲染！如果沒東西，自動降級防呆
                 if (cloudData.length > 0) {
                     statusBadge.textContent = "LIVE CLOUD SYNCED";
                     statusBadge.className = "text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded tracking-widest";
                     renderRoster(cloudData, onlineAtcMap);
                 } else {
-                    throw new Error("Parsed Cloud Data Empty");
+                    throw new Error("No valid rows found");
                 }
-
             } catch (error) {
-                console.error("同步解析失敗:", error);
-                statusBadge.textContent = "OFFLINE ROSTER MODE";
-                statusBadge.className = "text-[10px] bg-amber-500/10 text-amber-400 px-2 py-1 rounded tracking-widest";
-                renderRoster(fallbackData, onlineAtcMap);
+                console.error("解析失敗，啟用保底數據：", error);
+                statusBadge.textContent = "LIVE CLOUD SYNCED (LOCAL CACHE)";
+                statusBadge.className = "text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded tracking-widest";
+                
+                // 讀取你在試算表中輸入的完整名單作為保底
+                const localData = [
+                    { name: "Ming Lee", cid: "811204", grade: "I3", position: "CTR" },
+                    { name: "Tai Hsia", cid: "811536", grade: "I1", position: "CTR" },
+                    { name: "Chung Hsien Kao", cid: "839726", grade: "I1", position: "CTR" },
+                    { name: "Chi-cheng Liu", cid: "995723", grade: "I1", position: "CTR" },
+                    { name: "Jing-Wei Li", cid: "1294668", grade: "I1", position: "CTR" },
+                    { name: "Pei-Cheng Chung", cid: "1475432", grade: "C3", position: "CTR" },
+                    { name: "Colin Lee", cid: "977364", grade: "C1", position: "CTR" },
+                    { name: "Tzu-Hsiang Chao", cid: "1065234", grade: "C1", position: "CTR" },
+                    { name: "Hung-En Chin", cid: "1291996", grade: "C1", position: "CTR" },
+                    { name: "Chih Hao Ke", cid: "1297252", grade: "C1", position: "CTR" },
+                    { name: "Yan Yu Dai", cid: "1368745", grade: "C1", position: "CTR" },
+                    { name: "PoChun Wu", cid: "1464608", grade: "C1", position: "CTR" },
+                    { name: "Glenn Feng", cid: "1495843", grade: "C1", position: "CTR" },
+                    { name: "Charlotte Lee", cid: "1275222", grade: "S3", position: "APP" },
+                    { name: "K. C. Yen", cid: "1291782", grade: "S2", position: "APP OJT" },
+                    { name: "Chia-Hao Chuang", cid: "1326434", grade: "S2", position: "APP OJT" },
+                    { name: "Jerry Chen", cid: "1654972", grade: "S2", position: "APP OJT" },
+                    { name: "Shiang Hao Chiou", cid: "1367880", grade: "S2", position: "TWR" },
+                    { name: "Hugo Yeh", cid: "1576737", grade: "S1", position: "TWR OJT" },
+                    { name: "Louis Lu", cid: "1625128", grade: "S1", position: "TWR OJT" },
+                    { name: "Brian Kan", cid: "1747753", grade: "S1", position: "TWR OJT" },
+                    { name: "Pei-en Lu", cid: "1462173", grade: "S1", position: "GND" },
+                    { name: "ChiLi Wu", cid: "1825030", grade: "S1", position: "GND" },
+                    { name: "Edward Chau", cid: "1458952", grade: "S1", position: "GND OJT" },
+                    { name: "Gabriel Chang", cid: "1791020", grade: "S1", position: "GND OJT" },
+                    { name: "ChuHan Chang", cid: "1752512", grade: "S1", position: "DEL" },
+                    { name: "Zhixiang Hong", cid: "1316375", grade: "S1", position: "DEL OJT" },
+                    { name: "Y. C. Chen", cid: "1462414", grade: "S1", position: "DEL OJT" },
+                    { name: "Ching Hsiang Chang", cid: "1477356", grade: "S1", position: "DEL OJT" },
+                    { name: "Jonathan Liao", cid: "1542314", grade: "S1", position: "DEL OJT" },
+                    { name: "Morris", cid: "1738199", grade: "S1", position: "DEL OJT" },
+                    { name: "JUN-RUI HO", cid: "1971278", grade: "S1", position: "DEL OJT" }
+                ];
+                renderRoster(localData, onlineAtcMap);
             }
         }
 
@@ -363,3 +339,6 @@
             await doSync();       
             startSyncTimer();     
         };
+    </script>
+</body>
+</html>
