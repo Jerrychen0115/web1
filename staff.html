@@ -50,10 +50,9 @@
         th { background: rgba(0, 0, 0, 0.3); }
         .section-header { background: rgba(30, 41, 59, 0.6); }
 
-        /* 呼吸燈動畫 */
         @keyframes pulse-light {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; transform: scale(1.05); }
+            0%, 100__ { opacity: 0.6; }
+            50% { opacity: 1; transform: scale(1.03); }
         }
         .animate-pulse-light {
             animation: pulse-light 2s infinite ease-in-out;
@@ -82,7 +81,10 @@
                     VATROC ATC Roster
                 </h2>
                 <div class="flex flex-col items-end gap-1">
-                    <span id="sync-status" class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded tracking-widest">LOADING ROSTER</span>
+                    <div class="flex items-center gap-2">
+                        <span id="next-sync" class="text-[9px] text-slate-400 font-mono">Next sync in 15s</span>
+                        <span id="sync-status" class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded tracking-widest">LOADING</span>
+                    </div>
                     <span id="vatsim-status" class="text-[9px] text-slate-400 font-mono">VATSIM API: Fetching...</span>
                 </div>
             </div>
@@ -106,14 +108,11 @@
     </main>
 
     <script>
-        // 1. Google 試算表設定
         const SPREADSHEET_ID = "1_BSJfJoLN2mFBcL97pmq-YonTJKL8QFwdqMut-gWRW4";
         const googleSheetJsonUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json`;
-
-        // 2. VATSIM 官方 Live Data API 端點
         const VATSIM_DATA_URL = "https://data.vatsim.net/v3/vatsim-data.json";
 
-        // 本機備用完整名單
+        // 本機備用本地緩存名單
         const fallbackData = [
             { name: "Ming Lee", cid: "811204", grade: "I3", position: "CTR" },
             { name: "Tai Hsia", cid: "811536", grade: "I1", position: "CTR" },
@@ -161,30 +160,27 @@
             "DEL OJT": "Delivery Control (DEL)"
         };
 
-        // 核心抓取函式：同時取得 VATSIM 線上 ATC 資料
         async function fetchVatsimControllers() {
             try {
                 const response = await fetch(VATSIM_DATA_URL);
-                if (!response.ok) throw new Error("VATSIM API Unreachable");
+                if (!response.ok) throw new Error("VATSIM API Offline");
                 const data = await response.json();
                 
-                // 將線上的 ATC 轉化成以 CID 為 Key 的 Map，方便一秒比對
                 const onlineMap = new Map();
                 if (data && data.controllers) {
                     data.controllers.forEach(controller => {
                         onlineMap.set(String(controller.cid), controller.callsign);
                     });
                 }
-                document.getElementById('vatsim-status').textContent = `VATSIM API: Connected (${onlineMap.size} ATCs Online globally)`;
+                document.getElementById('vatsim-status').textContent = `VATSIM API: Connected (${onlineMap.size} ATCs Online)`;
                 return onlineMap;
             } catch (e) {
-                console.error("無法取得 VATSIM 線上資料:", e);
-                document.getElementById('vatsim-status').textContent = "VATSIM API: Local Cache Mode (Offline)";
-                return new Map(); // 失敗時回傳空 Map，不影響名單排版
+                console.error("VATSIM 連線失敗:", e);
+                document.getElementById('vatsim-status').textContent = "VATSIM API: Offline Cache Mode";
+                return new Map();
             }
         }
 
-        // 渲染畫面（結合試算表與 VATSIM 連線狀態）
         function renderRoster(memberList, onlineAtcMap) {
             const tableBody = document.getElementById('roster-table-body');
             
@@ -225,17 +221,16 @@
                     `;
 
                     membersInGroup.forEach(member => {
-                        // 🔍 比對 VATSIM API：檢查此 CID 目前是否正在線上執勤
                         const isOnline = onlineAtcMap.has(String(member.cid));
-                        const activeCallsign = isOnline ? onlineAtcMap.get(String(member.cid)) : "";
+                        const liveCallsign = isOnline ? onlineAtcMap.get(String(member.cid)) : "";
 
                         htmlContent += `
                             <tr class="hover:bg-white/5 transition-colors">
                                 <td class="p-4 font-bold text-blue-400 pl-6 flex items-center gap-2">
                                     ${member.name}
                                     ${isOnline ? `
-                                        <span class="inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-400 text-[10px] px-1.5 py-0.5 rounded font-black tracking-tighter animate-pulse-light">
-                                            <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span>● LIVE
+                                        <span class="inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-400 text-[10px] px-2 py-0.5 rounded font-black tracking-tighter animate-pulse-light">
+                                            <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span>LIVE
                                         </span>
                                     ` : ''}
                                 </td>
@@ -243,8 +238,8 @@
                                 <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">${member.grade}</td>
                                 <td class="p-4 text-center font-mono">
                                     ${isOnline ? `
-                                        <span class="text-emerald-400 font-bold">${activeCallsign}</span>
-                                        <span class="text-slate-500 text-xs">(${member.position})</span>
+                                        <span class="text-emerald-400 font-bold block">${liveCallsign}</span>
+                                        <span class="text-slate-400 text-[11px]">(${member.position})</span>
                                     ` : `
                                         <span class="text-slate-300">${member.position}</span>
                                     `}
@@ -258,24 +253,20 @@
             tableBody.innerHTML = htmlContent;
         }
 
-        async function initRosterSync() {
+        async function doSync() {
             const statusBadge = document.getElementById('sync-status');
-            
-            // 先去撈 VATSIM 官方資料
             const onlineAtcMap = await fetchVatsimControllers();
             
-            // 判斷是否為本機環境
             if (window.location.protocol === 'file:') {
-                statusBadge.textContent = "LOCAL SECURE MODE";
-                statusBadge.className = "text-[10px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded tracking-widest";
+                statusBadge.textContent = "OFFLINE ROSTER MODE";
+                statusBadge.className = "text-[10px] bg-amber-500/10 text-amber-400 px-2 py-1 rounded tracking-widest";
                 renderRoster(fallbackData, onlineAtcMap);
                 return;
             }
 
-            // 線上環境：對接 Google 試算表
             try {
-                const response = await fetch(googleSheetJsonUrl);
-                if (!response.ok) throw new Error("API Offline");
+                const response = await fetch(googleSheetJsonUrl + `&nocache=${new Date().getTime()}`); // 加上隨機數防止瀏覽器快取舊資料
+                if (!response.ok) throw new Error("Cloud Sheets Fetch Failed");
                 
                 const rawText = await response.text();
                 const jsonString = rawText.match(/google\.visualization\.Query\.setResponse\(([\s\S\w\W]*)\);/)[1];
@@ -304,14 +295,34 @@
                 renderRoster(cloudData, onlineAtcMap);
 
             } catch (error) {
-                console.warn("Using local dataset due to fetch restrictions.", error);
+                console.warn("自動降級切換至預設清單:", error);
                 statusBadge.textContent = "OFFLINE ROSTER MODE";
                 statusBadge.className = "text-[10px] bg-amber-500/10 text-amber-400 px-2 py-1 rounded tracking-widest";
                 renderRoster(fallbackData, onlineAtcMap);
             }
         }
 
-        window.onload = initRosterSync;
+        // 🕒 核心功能：建立每秒執行的倒數計時與定時更新監聽器
+        let countdown = 15;
+        function startSyncTimer() {
+            const timerText = document.getElementById('next-sync');
+            
+            setInterval(async () => {
+                countdown--;
+                if (countdown <= 0) {
+                    timerText.textContent = "Syncing...";
+                    await doSync();
+                    countdown = 15; // 每 15 秒重新抓一次最新試算表
+                } else {
+                    timerText.textContent = `Next sync in ${countdown}s`;
+                }
+            }, 1000);
+        }
+
+        window.onload = async () => {
+            await doSync();       // 第一秒進網頁先抓一次
+            startSyncTimer();     // 啟動 15 秒循環自動更新
+        };
     </script>
 </body>
 </html>
