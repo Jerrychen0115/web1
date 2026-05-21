@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=1280">
     <title>VATROC - ATC Roster</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -16,6 +17,17 @@
     </style>
 </head>
 <body class="p-4 md:p-8">
+    <nav class="flex justify-between items-center mb-12 max-w-7xl mx-auto relative z-10">
+        <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
+            <img src="VATROC.png" alt="VATROC Logo" class="vatroc-logo">
+        </div>
+        <div class="hidden md:flex gap-8 text-sm font-medium text-white text-shadow-sm items-center">
+            <a href="index.html" class="hover:text-blue-300 transition-colors">Main Page</a>
+            <a href="staff.html" class="text-white underline decoration-blue-500 underline-offset-8 decoration-2">ATC center</a>
+            <a href="https://ais.caa.gov.tw/eaip/" target="_blank" class="hover:text-blue-300">Pilot resources</a>
+            <a href="joinatc.html" class="text-white underline decoration-blue-500 underline-offset-8 decoration-2">ATC training / Visiting</a>
+        </div>
+    </nav>
 
     <main class="max-w-7xl mx-auto relative z-10">
         <div class="glass-card p-6 md:p-8">
