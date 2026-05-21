@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
-        body { background-image: url('TP.png'); background-size: cover; background-position: center; background-attachment: fixed; font-family: 'Inter', sans-serif; color: #f8fafc; min-height: 100vh; position: relative; }
+        body { background-image: url('TP.png'); background-size: cover; background-position: center; background-attachment: fixed; font-family: 'Inter', sans-serif; color: #f8fafc; min-height: 100vh; }
         body::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.4); z-index: -1; }
         .glass-card { background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; }
         .section-header { background: rgba(30, 41, 59, 0.6); }
@@ -28,9 +28,8 @@
                 <thead>
                     <tr class="text-[11px] text-slate-300 uppercase font-bold">
                         <th class="p-4 w-[30%]">Name</th>
-                        <th class="p-4 w-[20%]">CID</th>
-                        <th class="p-4 w-[20%]">Grade</th>
-                        <th class="p-4 w-[30%]">Position</th>
+                        <th class="p-4 w-[15%]">CID</th>
+                        <th class="p-4 w-[15%]">Grade</th> <th class="p-4 w-[40%]">Position</th>
                     </tr>
                 </thead>
                 <tbody id="roster-table-body" class="divide-y divide-white/5 text-sm"></tbody>
@@ -39,7 +38,6 @@
     </main>
 
     <script>
-        // 🚨 這裡填入你的正確 CSV 網址
         const GOOGLE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTQHAreEebnMznd65GIyzJner2QBguCsMxK72sxxaOo2YBHj93zKCvvyrwSpo4ALDqpn-oL_6sE1xBo/pub?gid=0&single=true&output=csv";
         const VATSIM_API = "https://data.vatsim.net/v3/vatsim-data.json";
 
@@ -73,8 +71,7 @@
                                         ${isOnline ? '<span class="ml-2 bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[9px] font-black online-dot">● ONLINE</span>' : ''}
                                     </td>
                                     <td class="p-4 font-mono text-slate-400">${r[1]}</td>
-                                    <td class="p-4 text-slate-300">${r[2]}</td>
-                                    <td class="p-4 text-slate-300">${r[3]}</td>
+                                    <td class="p-4 text-slate-300 font-mono">${r[2]}</td> <td class="p-4 text-slate-300">${r[3]}</td>
                                 </tr>`;
                         });
                     }
