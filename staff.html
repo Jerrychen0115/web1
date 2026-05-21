@@ -10,76 +10,83 @@
         body { background-image: url('TP.png'); background-size: cover; background-position: center; background-attachment: fixed; font-family: 'Inter', sans-serif; color: #f8fafc; min-height: 100vh; position: relative; }
         body::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.4); z-index: -1; }
         .glass-card { background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; }
-        .vatroc-logo { height: 90px; width: auto; }
-        th { background: rgba(0, 0, 0, 0.3); }
         .section-header { background: rgba(30, 41, 59, 0.6); }
-        
-        /* 綠燈呼吸燈效果 */
-        @keyframes pulse-green {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
         .online-dot { animation: pulse-green 1.5s infinite; }
+        @keyframes pulse-green { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
     <main class="max-w-7xl mx-auto relative z-10">
         <div class="glass-card p-6 md:p-8">
-            <h2 class="text-3xl font-black text-white mb-8">VATROC ATC Roster</h2>
+            <div class="flex justify-between items-center mb-8 border-b border-white/5 pb-4">
+                <h2 class="text-3xl font-black text-white">VATROC ATC Roster</h2>
+                <div id="sync-status" class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded">LOADING...</div>
+            </div>
+            
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="text-[11px] text-slate-300 uppercase font-bold">
-                        <th class="p-4 w-[40%]">Name</th>
+                        <th class="p-4 w-[30%]">Name</th>
                         <th class="p-4 w-[20%]">CID</th>
-                        <th class="p-4 w-[40%]">Status</th>
+                        <th class="p-4 w-[20%]">Grade</th>
+                        <th class="p-4 w-[30%]">Position</th>
                     </tr>
                 </thead>
-                <tbody id="roster-table-body" class="divide-y divide-white/5 font-medium text-sm"></tbody>
+                <tbody id="roster-table-body" class="divide-y divide-white/5 text-sm"></tbody>
             </table>
         </div>
     </main>
 
     <script>
-        const GOOGLE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTQHAreEebnMznd65GIyzJner2QBguCsMxK72sxxaOo2YBHj93zKCvvyrwSpo4ALDqpn-oL_6sE1xBo/pub?gid=0&single=true&output=csv"; // 請務必填入你的網址
+        // 🚨 這裡填入你的正確 CSV 網址
+        const GOOGLE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTQHAreEebnMznd65GIyzJner2QBguCsMxK72sxxaOo2YBHj93zKCvvyrwSpo4ALDqpn-oL_6sE1xBo/pub?gid=0&single=true&output=csv";
         const VATSIM_API = "https://data.vatsim.net/v3/vatsim-data.json";
 
-        async function syncRoster() {
-            // 1. 同時獲取 Google 表格與 VATSIM 數據
-            const [csvRes, vatsimRes] = await Promise.all([
-                fetch(`${GOOGLE_CSV_URL}&_cb=${Date.now()}`, { cache: 'no-store' }),
-                fetch(VATSIM_API)
-            ]);
+        const categories = ["CTR", "APP", "TWR", "GND", "DEL"];
 
-            const csvText = await csvRes.text();
-            const vatsimData = await vatsimRes.json();
-            
-            // 將所有線上管制員 CID 存入 Set 加速比對
-            const onlineCids = new Set(vatsimData.controllers.map(c => String(c.cid)));
+        async function updateRoster() {
+            try {
+                const [csvRes, vatsimRes] = await Promise.all([
+                    fetch(`${GOOGLE_CSV_URL}&_cb=${Date.now()}`, { cache: 'no-store' }),
+                    fetch(VATSIM_API)
+                ]);
 
-            // 解析表格
-            const rows = csvText.split('\n').map(row => row.split(',').map(c => c.replace(/^"|"$/g, '').trim()));
-            const tableBody = document.getElementById('roster-table-body');
-            tableBody.innerHTML = '';
+                const csvText = await csvRes.text();
+                const vatsimData = await vatsimRes.json();
+                const onlineCids = new Set(vatsimData.controllers.map(c => String(c.cid)));
 
-            rows.forEach(r => {
-                if (r.length >= 2 && /^\d+$/.test(r[1])) {
-                    const isOnline = onlineCids.has(r[1]);
-                    tableBody.innerHTML += `
-                        <tr class="hover:bg-white/5">
-                            <td class="p-4 font-bold text-blue-400">
-                                ${r[0]} 
-                                ${isOnline ? '<span class="ml-2 bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px] uppercase font-black online-dot">● ONLINE</span>' : ''}
-                            </td>
-                            <td class="p-4 font-mono text-slate-400">${r[1]}</td>
-                            <td class="p-4 text-slate-300">${r[3] || ''}</td>
-                        </tr>`;
-                }
-            });
+                const rows = csvText.split('\n').map(row => row.split(',').map(c => c.replace(/^"|"$/g, '').trim()));
+                const tableBody = document.getElementById('roster-table-body');
+                tableBody.innerHTML = '';
+
+                categories.forEach(cat => {
+                    const filtered = rows.filter(r => r.length >= 4 && r[3].toUpperCase().includes(cat));
+                    if (filtered.length > 0) {
+                        tableBody.innerHTML += `<tr class="section-header"><td colspan="4" class="p-3 text-xs font-bold text-slate-200 uppercase">${cat} Group</td></tr>`;
+                        filtered.forEach(r => {
+                            const isOnline = onlineCids.has(r[1]);
+                            tableBody.innerHTML += `
+                                <tr class="hover:bg-white/5">
+                                    <td class="p-4 font-bold text-blue-400">
+                                        ${r[0]} 
+                                        ${isOnline ? '<span class="ml-2 bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[9px] font-black online-dot">● ONLINE</span>' : ''}
+                                    </td>
+                                    <td class="p-4 font-mono text-slate-400">${r[1]}</td>
+                                    <td class="p-4 text-slate-300">${r[2]}</td>
+                                    <td class="p-4 text-slate-300">${r[3]}</td>
+                                </tr>`;
+                        });
+                    }
+                });
+                document.getElementById('sync-status').textContent = "LIVE SYNCED";
+            } catch (e) {
+                document.getElementById('sync-status').textContent = "SYNC ERROR";
+            }
         }
 
-        setInterval(syncRoster, 30000); // 每 30 秒更新一次
-        syncRoster();
+        setInterval(updateRoster, 30000);
+        updateRoster();
     </script>
 </body>
 </html>
