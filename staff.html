@@ -108,7 +108,7 @@
     </main>
 
     <script>
-        // 鎖定你發布出來的正確試算表金鑰
+        // 🎯 核心修正：使用與你發布畫面完全一致的官方標準 CSV 下載流網址，拔除任何會引發 404 的贅字參數
         const GOOGLE_PUBLISH_KEY = "2PACX-1vTQHAReEebnMznd65GlyzJner2QBgucSMxK72sxxaOo2YBHj93zKCvyrwSpo4ALDqpn-oL_6sE1xBo";
         const googleSheetCsvUrl = `https://docs.google.com/spreadsheets/d/e/${GOOGLE_PUBLISH_KEY}/pub?output=csv`;
         
@@ -182,7 +182,6 @@
             }
         }
 
-        // 🛠️ 重新優化的安全 CSV 欄位切割器
         function parseCSV(text) {
             let lines = text.split(/\r\n|\n/);
             return lines.map(line => {
@@ -289,17 +288,16 @@
             }
 
             try {
-                // 🕒 加上時間戳防快取
-                const response = await fetch(googleSheetCsvUrl + `&_ts=${new Date().getTime()}`);
+                // 🚀 完全移除會觸發 404 的快取後綴字，讓 Google 認得這串純淨的發布請求網址
+                const response = await fetch(googleSheetCsvUrl);
                 if (!response.ok) throw new Error("Cloud Sheets Fetch Failed");
                 
                 const csvText = await response.text();
                 const parsedRows = parseCSV(csvText);
                 const cloudData = [];
 
-                // 🎯 【全面修正】拋棄舊有的 .v 解析，100% 改用純陣列索引存取 CSV 直流欄位
                 parsedRows.forEach((row, index) => {
-                    if (index === 0) return; // 跳過標頭
+                    if (index === 0) return; // 跳過 CSV 標頭
                     
                     if (row && row.length >= 4) {
                         const name = row[0] ? row[0].trim() : "";
