@@ -3,60 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="viewport" content="width=1280">
     <title>VATROC - ATC Roster</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
-        
-        body { 
-            background-image: url('TP.png'); 
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            font-family: 'Inter', sans-serif; 
-            color: #f8fafc; 
-            min-height: 100vh; 
-            position: relative;
-        }
-
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(15, 23, 42, 0.4); 
-            z-index: -1;
-        }
-
-        .glass-card { 
-            background: rgba(15, 23, 42, 0.3); 
-            backdrop-filter: blur(8px); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 16px; 
-        }
-        
-        .text-shadow-sm {
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-        }
-
-        .font-mono { font-family: 'JetBrains Mono', monospace; }
-
-        .vatroc-logo {
-            height: 90px;
-            width: auto;
-            object-fit: contain;
-        }
-        
+        body { background-image: url('TP.png'); background-size: cover; background-position: center; background-attachment: fixed; font-family: 'Inter', sans-serif; color: #f8fafc; min-height: 100vh; position: relative; }
+        body::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.4); z-index: -1; }
+        .glass-card { background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; }
+        .vatroc-logo { height: 90px; width: auto; }
         th { background: rgba(0, 0, 0, 0.3); }
         .section-header { background: rgba(30, 41, 59, 0.6); }
-
-        @keyframes pulse-light {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; transform: scale(1.03); }
-        }
-        .animate-pulse-light {
-            animation: pulse-light 2s infinite ease-in-out;
-        }
+        .animate-pulse-light { animation: pulse-light 2s infinite ease-in-out; }
+        @keyframes pulse-light { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; transform: scale(1.03); } }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -65,8 +23,8 @@
         <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
             <img src="VATROC.png" alt="VATROC Logo" class="vatroc-logo">
         </div>
-        <div class="hidden md:flex gap-8 text-sm font-medium text-white text-shadow-sm items-center">
-            <a href="index.html" class="hover:text-blue-300 transition-colors">Main Page</a>
+        <div class="hidden md:flex gap-8 text-sm font-medium text-white items-center">
+            <a href="index.html" class="hover:text-blue-300">Main Page</a>
             <a href="staff.html" class="text-white underline decoration-blue-500 underline-offset-8 decoration-2">ATC center</a>
             <a href="https://ais.caa.gov.tw/eaip/" target="_blank" class="hover:text-blue-300">Pilot resources</a>
             <a href="joinatc.html" class="text-white underline decoration-blue-500 underline-offset-8 decoration-2">ATC training / Visiting</a>
@@ -76,217 +34,72 @@
     <main class="max-w-7xl mx-auto relative z-10">
         <div class="glass-card p-6 md:p-8 overflow-hidden">
             <div class="flex justify-between items-center mb-8 border-b border-white/5 pb-4">
-                <h2 class="text-3xl font-black tracking-tighter text-white text-shadow-sm flex items-center gap-3">
-                    <span class="w-2 h-8 bg-blue-500 rounded-full"></span>
-                    VATROC ATC Roster
+                <h2 class="text-3xl font-black text-white flex items-center gap-3">
+                    <span class="w-2 h-8 bg-blue-500 rounded-full"></span> VATROC ATC Roster
                 </h2>
                 <div class="flex flex-col items-end gap-1">
-                    <div class="flex items-center gap-2">
-                        <span id="next-sync" class="text-[9px] text-slate-400 font-mono">Next sync in 15s</span>
-                        <span id="sync-status" class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded tracking-widest">LOADING</span>
-                    </div>
-                    <span id="vatsim-status" class="text-[9px] text-slate-400 font-mono">VATSIM API: Fetching...</span>
+                    <span id="next-sync" class="text-[9px] text-slate-400 font-mono">Syncing...</span>
+                    <span id="sync-status" class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded">LOADING</span>
                 </div>
             </div>
             
-            <div class="overflow-x-auto custom-scroll">
-                <table class="w-full text-left table-fixed border-collapse">
-                    <thead>
-                        <tr class="text-[11px] text-slate-300 uppercase font-bold">
-                            <th class="p-4 w-[30%] text-center">Name</th>
-                            <th class="p-4 w-[20%] text-center">CID</th>
-                            <th class="p-4 w-[20%] text-center">Grade</th>
-                            <th class="p-4 w-[25%] text-center">Position</th>
-                        </tr>
-                    </thead>
-                    
-                    <tbody id="roster-table-body" class="divide-y divide-white/5 font-medium text-sm">
-                        </tbody>
-                </table>
-            </div>
+            <table class="w-full text-left table-fixed border-collapse">
+                <thead>
+                    <tr class="text-[11px] text-slate-300 uppercase font-bold">
+                        <th class="p-4 w-[30%] text-center">Name</th>
+                        <th class="p-4 w-[20%] text-center">CID</th>
+                        <th class="p-4 w-[20%] text-center">Grade</th>
+                        <th class="p-4 w-[25%] text-center">Position</th>
+                    </tr>
+                </thead>
+                <tbody id="roster-table-body" class="divide-y divide-white/5 font-medium text-sm"></tbody>
+            </table>
         </div>
     </main>
 
     <script>
-        // 固定使用正確的單一工作表 CSV 網址
+        // 🚨 請確認這裡放入的是你「發布到網路 -> 工作表1 -> CSV」後產生的新網址
         const BASE_GOOGLE_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTQHAreEebnMznd65GIyzJner2QBguCsMxK72sxxaOo2YBHj93zKCvvyrwSpo4ALDqpn-oL_6sE1xBo/pub?gid=0&single=true&output=csv";
-        const VATSIM_DATA_URL = "https://data.vatsim.net/v3/vatsim-data.json";
-
+        
         const categories = [
             { key: "CTR", title: "Area Control Center (CTR)" },
-            { key: "APP OJT", title: "Approach Control (APP)" },
             { key: "APP", title: "Approach Control (APP)" },
-            { key: "TWR OJT", title: "Tower Control (TWR)" },
             { key: "TWR", title: "Tower Control (TWR)" },
-            { key: "GND OJT", title: "Ground Control (GND)" },
             { key: "GND", title: "Ground Control (GND)" },
-            { key: "DEL OJT", title: "Delivery Control (DEL)" },
             { key: "DEL", title: "Delivery Control (DEL)" }
         ];
 
-        async function fetchVatsimControllers() {
-            try {
-                const response = await fetch(VATSIM_DATA_URL);
-                if (!response.ok) throw new Error("VATSIM API Offline");
-                const data = await response.json();
-                const onlineMap = new Map();
-                if (data && data.controllers) {
-                    data.controllers.forEach(controller => {
-                        onlineMap.set(String(controller.cid).trim(), controller.callsign);
-                    });
-                }
-                document.getElementById('vatsim-status').textContent = `VATSIM API: Connected (${onlineMap.size} ATCs Online)`;
-                return onlineMap;
-            } catch (e) {
-                document.getElementById('vatsim-status').textContent = "VATSIM API: Offline Cache Mode";
-                return new Map();
-            }
-        }
-
-        function parseCSV(text) {
-            let lines = text.split(/\r\n|\n/);
-            return lines.map(line => {
-                let result = [];
-                let current = '';
-                let inQuotes = false;
-                for (let i = 0; i < line.length; i++) {
-                    let char = line[i];
-                    if (char === '"') {
-                        inQuotes = !inQuotes;
-                    } else if (char === ',' && !inQuotes) {
-                        result.push(current.trim());
-                        current = '';
-                    } else {
-                        current += char;
-                    }
-                }
-                result.push(current.trim());
-                return result.map(str => str.replace(/^"|"$/g, '').trim());
-            });
-        }
-
-        function renderRoster(memberList, onlineAtcMap) {
-            const tableBody = document.getElementById('roster-table-body');
-            const groups = {
-                "Area Control Center (CTR)": [], "Approach Control (APP)": [],
-                "Tower Control (TWR)": [], "Ground Control (GND)": [],
-                "Delivery Control (DEL)": [], "Unassigned": []
-            };
-
-            memberList.forEach(member => {
-                let assigned = false;
-                const posUpper = String(member.position).toUpperCase();
-                for (let cat of categories) {
-                    if (posUpper === cat.key || posUpper.includes(cat.key)) {
-                        groups[cat.title].push(member);
-                        assigned = true;
-                        break;
-                    }
-                }
-                if (!assigned) groups["Unassigned"].push(member);
-            });
-
-            let htmlContent = "";
-            const displayOrder = ["Area Control Center (CTR)", "Approach Control (APP)", "Tower Control (TWR)", "Ground Control (GND)", "Delivery Control (DEL)", "Unassigned"];
-
-            displayOrder.forEach(categoryTitle => {
-                const membersInGroup = groups[categoryTitle];
-                if (membersInGroup && membersInGroup.length > 0) {
-                    htmlContent += `
-                        <tr class="section-header">
-                            <td colspan="4" class="p-3 text-xs font-bold tracking-wider text-slate-200 uppercase pl-4 bg-slate-800/80">${categoryTitle}</td>
-                        </tr>
-                    `;
-                    membersInGroup.forEach(member => {
-                        const cleanCid = String(member.cid).trim();
-                        const isOnline = onlineAtcMap.has(cleanCid);
-                        const liveCallsign = isOnline ? onlineAtcMap.get(cleanCid) : "";
-                        htmlContent += `
-                            <tr class="hover:bg-white/5 transition-colors">
-                                <td class="p-4 font-bold text-blue-400 pl-6 flex items-center gap-2">
-                                    ${member.name}
-                                    ${isOnline ? `<span class="inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-400 text-[10px] px-2 py-0.5 rounded font-black tracking-tighter animate-pulse-light"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span>LIVE</span>` : ''}
-                                </td>
-                                <td class="p-4 text-center text-slate-300 font-mono">${member.cid}</td>
-                                <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">${member.grade}</td>
-                                <td class="p-4 text-center font-mono">
-                                    ${isOnline ? `<span class="text-emerald-400 font-bold block">${liveCallsign}</span><span class="text-slate-400 text-[11px]">(${member.position})</span>` : `<span class="text-slate-300">${member.position}</span>`}
-                                </td>
-                            </tr>
-                        `;
-                    });
-                }
-            });
-            tableBody.innerHTML = htmlContent;
-        }
-
         async function doSync() {
             const statusBadge = document.getElementById('sync-status');
-            const onlineAtcMap = await fetchVatsimControllers();
-            
             try {
-                // 🚀 防暫存核心：在網址後方強行加上時間戳記，確保每次撈取都是跟 Google 要熱騰騰的最新資料
-                const cacheBusterUrl = `${BASE_GOOGLE_URL}&_cb=${Date.now()}`;
-                const response = await fetch(cacheBusterUrl);
-                if (!response.ok) throw new Error("Fetch Error");
-                
+                // 強制跳過快取
+                const response = await fetch(`${BASE_GOOGLE_URL}&_cb=${Date.now()}`, { cache: 'no-store' });
                 const csvText = await response.text();
                 
-                // 安全檢查：如果是被導向到 HTML 頁面就報錯
-                if (csvText.includes("<!DOCTYPE") || csvText.includes("<html")) {
-                    throw new Error("Format error: Received HTML instead of CSV.");
-                }
+                if (csvText.includes("<html")) throw new Error("Waiting for Google Cache...");
 
-                const parsedRows = parseCSV(csvText);
-                const cloudData = [];
+                const rows = csvText.split('\n').map(row => row.split(',').map(cell => cell.replace(/^"|"$/g, '').trim()));
+                const tableBody = document.getElementById('roster-table-body');
+                tableBody.innerHTML = '';
 
-                parsedRows.forEach((row) => {
-                    if (row && row.length >= 2) {
-                        let name = row[0] ? row[0].trim() : "";
-                        let cid = row[1] ? row[1].trim() : "";
-                        let grade = row[2] ? row[2].trim() : "";
-                        let position = row[3] ? row[3].trim() : "";
-
-                        if (name !== "" && /^\d+$/.test(cid)) {
-                            cloudData.push({ name, cid, grade, position });
-                        }
+                categories.forEach(cat => {
+                    const filtered = rows.filter(r => r.length >= 4 && r[3].toUpperCase().includes(cat.key));
+                    if (filtered.length > 0) {
+                        tableBody.innerHTML += `<tr class="section-header"><td colspan="4" class="p-3 text-xs font-bold text-slate-200 uppercase pl-4">${cat.title}</td></tr>`;
+                        filtered.forEach(r => {
+                            tableBody.innerHTML += `<tr><td class="p-4 pl-6 text-blue-400 font-bold">${r[0]}</td><td class="p-4 text-center text-slate-300 font-mono">${r[1]}</td><td class="p-4 text-center">${r[2]}</td><td class="p-4 text-center">${r[3]}</td></tr>`;
+                        });
                     }
                 });
-
-                if (cloudData.length > 0) {
-                    statusBadge.textContent = "LIVE CLOUD SYNCED";
-                    statusBadge.className = "text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded tracking-widest";
-                    renderRoster(cloudData, onlineAtcMap);
-                } else {
-                    throw new Error("No valid data rows filtered.");
-                }
-            } catch (error) {
-                console.error("重新同步失敗，維持當前顯示:", error);
-                // 即使失敗也只在右上角提示，不摧毀或重置畫面的內容，維持現狀
-                statusBadge.textContent = "SYNC RETRYING...";
-                statusBadge.className = "text-[10px] bg-amber-500/10 text-amber-400 px-2 py-1 rounded tracking-widest";
+                statusBadge.textContent = "SYNCED";
+                statusBadge.className = "text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded";
+            } catch (e) {
+                statusBadge.textContent = "WAITING FOR SYNC...";
             }
         }
 
-        let countdown = 15;
-        function startSyncTimer() {
-            const timerText = document.getElementById('next-sync');
-            setInterval(async () => {
-                countdown--;
-                if (countdown <= 0) {
-                    timerText.textContent = "Syncing...";
-                    await doSync();
-                    countdown = 15; 
-                } else {
-                    timerText.textContent = `Next sync in ${countdown}s`;
-                }
-            }, 1000);
-        }
-
-        window.onload = async () => {
-            await doSync();       
-            startSyncTimer();     
-        };
+        setInterval(doSync, 15000);
+        doSync();
     </script>
 </body>
-</html>
+</html>Body.innerHTML += `<tr><td class="p-4 pl-6 text-blue
