@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VATROC - ATC Roster</title>
+    <title>VATROC | ATC Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
@@ -15,7 +15,7 @@
         }
         body::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.4); z-index: -1; }
         .glass-card { background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; }
-        .vatroc-logo { height: 90px; width: auto; }
+        .vatroc-logo { height: 90px; width: auto; object-fit: contain; }
         th { background: rgba(0, 0, 0, 0.3); }
         .section-header { background: rgba(30, 41, 59, 0.6); }
         .animate-pulse-light { animation: pulse-light 2s infinite ease-in-out; }
@@ -24,38 +24,40 @@
 </head>
 <body class="p-4 md:p-8">
 
-    <nav class="flex justify-between items-center mb-12 max-w-7xl mx-auto relative z-10">
+    <nav class="flex justify-between items-center mb-10 max-w-7xl mx-auto relative z-10">
         <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
             <img src="VATROC.png" alt="VATROC Logo" class="vatroc-logo">
         </div>
         <div class="hidden md:flex gap-8 text-sm font-medium text-white items-center">
             <a href="index.html" class="hover:text-blue-300">Main Page</a>
-            <a href="staff.html" class="text-white underline decoration-blue-500 underline-offset-8 decoration-2">ATC center</a>
+            <a href="staff.html" class="underline decoration-blue-500 underline-offset-8 decoration-2">ATC center</a>
             <a href="https://ais.caa.gov.tw/eaip/" target="_blank" class="hover:text-blue-300">Pilot resources</a>
-            <a href="joinatc.html" class="text-white underline decoration-blue-500 underline-offset-8 decoration-2">ATC training / Visiting</a>
+            <a href="joinatc.html" class="hover:text-blue-300">ATC training / Visiting</a>
         </div>
     </nav>
 
     <main class="max-w-7xl mx-auto relative z-10">
         <div class="glass-card p-6 md:p-8">
             <div class="flex justify-between items-center mb-8 border-b border-white/5 pb-4">
-                <h2 class="text-3xl font-black text-white flex items-center gap-3">
+                <h2 class="text-3xl font-black tracking-tighter text-white flex items-center gap-3">
                     <span class="w-2 h-8 bg-blue-500 rounded-full"></span> VATROC ATC Roster
                 </h2>
-                <div class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded" id="sync-status">LOADING...</div>
+                <div id="sync-status" class="text-[10px] bg-blue-500/10 text-blue-400 px-3 py-1 rounded font-mono tracking-widest">LOADING...</div>
             </div>
             
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="text-[11px] text-slate-300 uppercase font-bold">
-                        <th class="p-4 w-[30%]">Name</th>
-                        <th class="p-4 w-[20%]">CID</th>
-                        <th class="p-4 w-[20%]">Grade</th>
-                        <th class="p-4 w-[30%]">Position</th>
-                    </tr>
-                </thead>
-                <tbody id="roster-table-body" class="divide-y divide-white/5 text-sm"></tbody>
-            </table>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse table-fixed">
+                    <thead>
+                        <tr class="text-[11px] text-slate-300 uppercase font-bold tracking-widest">
+                            <th class="p-4 w-[30%]">Name</th>
+                            <th class="p-4 w-[20%] text-center">CID</th>
+                            <th class="p-4 w-[20%] text-center">Grade</th>
+                            <th class="p-4 w-[30%] text-center">Position</th>
+                        </tr>
+                    </thead>
+                    <tbody id="roster-table-body" class="divide-y divide-white/5 text-sm font-medium"></tbody>
+                </table>
+            </div>
         </div>
     </main>
 
@@ -65,6 +67,7 @@
         const categories = ["CTR", "APP", "TWR", "GND", "DEL"];
 
         async function updateRoster() {
+            const statusBadge = document.getElementById('sync-status');
             try {
                 const [csvRes, vatsimRes] = await Promise.all([
                     fetch(`${GOOGLE_CSV_URL}&_cb=${Date.now()}`, { cache: 'no-store' }),
@@ -82,25 +85,27 @@
                 categories.forEach(cat => {
                     const filtered = rows.filter(r => r.length >= 4 && r[3].toUpperCase().includes(cat));
                     if (filtered.length > 0) {
-                        tableBody.innerHTML += `<tr class="section-header"><td colspan="4" class="p-3 text-xs font-bold text-slate-200 uppercase">${cat} Group</td></tr>`;
+                        tableBody.innerHTML += `<tr class="section-header"><td colspan="4" class="p-3 text-xs font-bold text-slate-200 uppercase tracking-widest pl-4">${cat} Control</td></tr>`;
                         filtered.forEach(r => {
                             const isOnline = onlineCids.has(r[1]);
                             tableBody.innerHTML += `
-                                <tr class="hover:bg-white/5">
-                                    <td class="p-4 font-bold text-blue-400">
+                                <tr class="hover:bg-white/5 transition-colors">
+                                    <td class="p-4 font-bold text-blue-400 pl-6">
                                         ${r[0]} 
-                                        ${isOnline ? '<span class="ml-2 bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[9px] font-black animate-pulse-light">● ONLINE</span>' : ''}
+                                        ${isOnline ? '<span class="ml-3 bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[9px] font-black animate-pulse-light">● ONLINE</span>' : ''}
                                     </td>
-                                    <td class="p-4 font-mono text-slate-400">${r[1]}</td>
-                                    <td class="p-4 text-slate-300 font-mono">${r[2]}</td>
-                                    <td class="p-4 text-slate-300">${r[3]}</td>
+                                    <td class="p-4 text-center text-slate-400 font-mono">${r[1]}</td>
+                                    <td class="p-4 text-center text-slate-300 font-mono">${r[2]}</td>
+                                    <td class="p-4 text-center text-slate-300">${r[3]}</td>
                                 </tr>`;
                         });
                     }
                 });
-                document.getElementById('sync-status').textContent = "LIVE SYNCED";
+                statusBadge.textContent = "LIVE SYNCED";
+                statusBadge.className = "text-[10px] bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded font-mono tracking-widest";
             } catch (e) {
-                document.getElementById('sync-status').textContent = "SYNC ERROR";
+                statusBadge.textContent = "SYNC ERROR";
+                statusBadge.className = "text-[10px] bg-red-500/10 text-red-400 px-3 py-1 rounded font-mono tracking-widest";
             }
         }
 
