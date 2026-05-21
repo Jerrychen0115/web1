@@ -108,9 +108,8 @@
     </main>
 
     <script>
-        // 📢 【請把下方雙引號內的網址，替換成你剛剛選單改成「工作表1」與「CSV」後生成的新網址！】
-        const GOOGLE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTQHAreEebnMznd65GIyzJner2QBguCsMxK72sxxaOo2YBHj93zKCvvyrwSpo4ALDqpn-oL_6sE1xBo/pub?gid=0&single=true&output=csv";
-        
+        // 固定使用正確的單一工作表 CSV 網址
+        const BASE_GOOGLE_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTQHAreEebnMznd65GIyzJner2QBguCsMxK72sxxaOo2YBHj93zKCvvyrwSpo4ALDqpn-oL_6sE1xBo/pub?gid=0&single=true&output=csv";
         const VATSIM_DATA_URL = "https://data.vatsim.net/v3/vatsim-data.json";
 
         const categories = [
@@ -226,21 +225,28 @@
             const onlineAtcMap = await fetchVatsimControllers();
             
             try {
-                const response = await fetch(GOOGLE_CSV_URL);
+                // 🚀 防暫存核心：在網址後方強行加上時間戳記，確保每次撈取都是跟 Google 要熱騰騰的最新資料
+                const cacheBusterUrl = `${BASE_GOOGLE_URL}&_cb=${Date.now()}`;
+                const response = await fetch(cacheBusterUrl);
                 if (!response.ok) throw new Error("Fetch Error");
                 
                 const csvText = await response.text();
+                
+                // 安全檢查：如果是被導向到 HTML 頁面就報錯
+                if (csvText.includes("<!DOCTYPE") || csvText.includes("<html")) {
+                    throw new Error("Format error: Received HTML instead of CSV.");
+                }
+
                 const parsedRows = parseCSV(csvText);
                 const cloudData = [];
 
-                parsedRows.forEach((row, index) => {
+                parsedRows.forEach((row) => {
                     if (row && row.length >= 2) {
                         let name = row[0] ? row[0].trim() : "";
                         let cid = row[1] ? row[1].trim() : "";
                         let grade = row[2] ? row[2].trim() : "";
                         let position = row[3] ? row[3].trim() : "";
 
-                        // 有效資料過濾
                         if (name !== "" && /^\d+$/.test(cid)) {
                             cloudData.push({ name, cid, grade, position });
                         }
@@ -252,12 +258,13 @@
                     statusBadge.className = "text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded tracking-widest";
                     renderRoster(cloudData, onlineAtcMap);
                 } else {
-                    throw new Error("No valid rows found");
+                    throw new Error("No valid data rows filtered.");
                 }
             } catch (error) {
-                console.error("同步失敗:", error);
-                statusBadge.textContent = "SYNC ERROR (CHECK URL)";
-                statusBadge.className = "text-[10px] bg-red-500/10 text-red-400 px-2 py-1 rounded tracking-widest";
+                console.error("重新同步失敗，維持當前顯示:", error);
+                // 即使失敗也只在右上角提示，不摧毀或重置畫面的內容，維持現狀
+                statusBadge.textContent = "SYNC RETRYING...";
+                statusBadge.className = "text-[10px] bg-amber-500/10 text-amber-400 px-2 py-1 rounded tracking-widest";
             }
         }
 
