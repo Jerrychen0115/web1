@@ -3,114 +3,289 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VATROC | ATC Center</title>
+    <meta name="viewport" content="width=1280">
+    <title>VATROC - ATC Roster</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
         
         body { 
+            /* 【修正】確認你的圖片檔名與你上傳到 GitHub 的一致 */
             background-image: url('TP.png'); 
-            background-size: cover; background-position: center; background-attachment: fixed;
-            font-family: 'Inter', sans-serif; color: #f8fafc; min-height: 100vh; position: relative;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            font-family: 'Inter', sans-serif; 
+            color: #f8fafc; 
+            min-height: 100vh; 
+            position: relative;
         }
-        body::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.4); z-index: -1; }
-        .glass-card { background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; }
-        .vatroc-logo { height: 90px; width: auto; object-fit: contain; }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(15, 23, 42, 0.4); /* 降低遮罩濃度，讓圖片更亮 */
+            z-index: -1;
+        }
+
+        .glass-card { 
+            background: rgba(15, 23, 42, 0.3); /* 調低卡片透明度，增加毛玻璃感 */
+            backdrop-filter: blur(8px); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 16px; 
+        }
+        
+        /* 讓文字帶有陰影，確保在圖片背景下也能閱讀 */
+        .text-shadow-sm {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* LOGO 樣式 */
+        .vatroc-logo {
+            height: 90px;
+            width: auto;
+            object-fit: contain;
+        }
+        
+        /* 表格標頭背景 */
         th { background: rgba(0, 0, 0, 0.3); }
-        .section-header { background: rgba(30, 41, 59, 0.6); }
-        .animate-pulse-light { animation: pulse-light 2s infinite ease-in-out; }
-        @keyframes pulse-light { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; transform: scale(1.05); } }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <nav class="flex justify-between items-center mb-10 max-w-7xl mx-auto relative z-10">
+    <nav class="flex justify-between items-center mb-12 max-w-7xl mx-auto relative z-10">
         <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
             <img src="VATROC.png" alt="VATROC Logo" class="vatroc-logo">
         </div>
-        <div class="hidden md:flex gap-8 text-sm font-medium text-white items-center">
-            <a href="index.html" class="hover:text-blue-300">Main Page</a>
-            <a href="staff.html" class="underline decoration-blue-500 underline-offset-8 decoration-2">ATC center</a>
+        <div class="hidden md:flex gap-8 text-sm font-medium text-white text-shadow-sm items-center">
+            <a href="index.html" class="hover:text-blue-300 transition-colors">Main Page</a>
+            <a href="staff.html" class="text-white underline decoration-blue-500 underline-offset-8 decoration-2">ATC center</a>
             <a href="https://ais.caa.gov.tw/eaip/" target="_blank" class="hover:text-blue-300">Pilot resources</a>
-            <a href="joinatc.html" class="hover:text-blue-300">ATC training / Visiting</a>
+            <a href="joinatc.html" class="text-white underline decoration-blue-500 underline-offset-8 decoration-2">ATC training / Visiting</a>
         </div>
+    
     </nav>
 
     <main class="max-w-7xl mx-auto relative z-10">
-        <div class="glass-card p-6 md:p-8">
+        <div class="glass-card p-6 md:p-8 overflow-hidden">
             <div class="flex justify-between items-center mb-8 border-b border-white/5 pb-4">
-                <h2 class="text-3xl font-black tracking-tighter text-white flex items-center gap-3">
-                    <span class="w-2 h-8 bg-blue-500 rounded-full"></span> VATROC ATC Roster
+                <h2 class="text-3xl font-black tracking-tighter text-white text-shadow-sm flex items-center gap-3">
+                    <span class="w-2 h-8 bg-blue-500 rounded-full"></span>
+                    VATROC ATC Roster
                 </h2>
-                <div id="sync-status" class="text-[10px] bg-blue-500/10 text-blue-400 px-3 py-1 rounded font-mono tracking-widest">LOADING...</div>
+                <span class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded">OFFICIAL ROSTER</span>
             </div>
             
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse table-fixed">
+            <div class="overflow-x-auto custom-scroll">
+                <table class="w-full text-left table-fixed border-collapse">
                     <thead>
-                        <tr class="text-[11px] text-slate-300 uppercase font-bold tracking-widest">
-                            <th class="p-4 w-[30%]">Name</th>
+                        <tr class="text-[11px] text-slate-300 uppercase font-bold">
+                            <th class="p-4 w-[30%] text-center">Name</th>
                             <th class="p-4 w-[20%] text-center">CID</th>
                             <th class="p-4 w-[20%] text-center">Grade</th>
-                            <th class="p-4 w-[30%] text-center">Position</th>
+                            <th class="p-4 w-[25%] text-center">Position</th>
                         </tr>
                     </thead>
-                    <tbody id="roster-table-body" class="divide-y divide-white/5 text-sm font-medium"></tbody>
+                    <tbody class="divide-y divide-white/5 font-medium text-sm">
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Ming Lee</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">811204</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">I3</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">CTR</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Tai Hsia</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">811536</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">I1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">CTR</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Chung Hsien Kao</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">839726</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">I1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">CTR</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Chi-cheng Liu</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">995723</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">I1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">CTR</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Jing-Wei Li</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1294668</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">I1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">CTR</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Pei-Cheng Chung</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1475432</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">C3</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">CTR</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Colin Lee</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">977364</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">C1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">CTR</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Tzu-Hsiang Chao</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1065234</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">C1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">CTR</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Hung-En Chin</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1291996</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">C1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">CTR</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Chih Hao Ke</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1297252</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">C1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">CTR</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Yan Yu Dai</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1368745</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">C1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">CTR</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">PoChun Wu</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1464608</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">C1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">CTR</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Glenn Feng</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1495843</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">C1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">CTR</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Charlotte Lee</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1275222</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">S3</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">APP</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">K. C. Yen</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1291782</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">S2</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">APP OJT</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Chia-Hao Chuang</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1326434</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">S2</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">APP OJT</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Jerry Chen</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1654972</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">S2</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">APP OJT</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Shiang Hao Chiou</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1367880</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">S2</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">TWR</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Hugo Yeh</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1576737</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">S1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">TWR OJT</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Louis Lu</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1625128</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">S1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">TWR OJT</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Brian Kan</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1747753</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">S1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">TWR OJT</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Pei-en Lu</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1462173</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">S1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">GND</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">ChiLi Wu</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1825030</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">S1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">GND</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Edward Chau</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1458952</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">S1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">GND OJT</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Gabriel Chang</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1791020</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">S1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">GND OJT</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">ChuHan Chang</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1752512</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">S1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">DEL</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Zhixiang Hong</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1316375</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">S1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">DEL OJT</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Y. C. Chen</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1462414</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">S1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">DEL OJT</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Ching Hsiang Chang</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1477356</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">S1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">DEL OJT</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Jonathan Liao</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1542314</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">S1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">DEL OJT</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">Morris</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1738199</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">S1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">DEL OJT</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-bold text-blue-400">JUN-RUI HO visiting</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">1971278</td>
+                            <td class="p-4 text-center text-xs font-mono text-slate-100 bg-black/20 rounded">S1</td>
+                            <td class="p-4 text-center text-slate-300 font-mono">DEL</td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
     </main>
-
-    <script>
-        const GOOGLE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTQHAreEebnMznd65GIyzJner2QBguCsMxK72sxxaOo2YBHj93zKCvvyrwSpo4ALDqpn-oL_6sE1xBo/pub?gid=0&single=true&output=csv";
-        const VATSIM_API = "https://data.vatsim.net/v3/vatsim-data.json";
-        const categories = ["CTR", "APP", "TWR", "GND", "DEL"];
-
-        async function updateRoster() {
-            const statusBadge = document.getElementById('sync-status');
-            try {
-                const [csvRes, vatsimRes] = await Promise.all([
-                    fetch(`${GOOGLE_CSV_URL}&_cb=${Date.now()}`, { cache: 'no-store' }),
-                    fetch(VATSIM_API)
-                ]);
-
-                const csvText = await csvRes.text();
-                const vatsimData = await vatsimRes.json();
-                const onlineCids = new Set(vatsimData.controllers.map(c => String(c.cid)));
-
-                const rows = csvText.split('\n').map(row => row.split(',').map(c => c.replace(/^"|"$/g, '').trim()));
-                const tableBody = document.getElementById('roster-table-body');
-                tableBody.innerHTML = '';
-
-                categories.forEach(cat => {
-                    const filtered = rows.filter(r => r.length >= 4 && r[3].toUpperCase().includes(cat));
-                    if (filtered.length > 0) {
-                        tableBody.innerHTML += `<tr class="section-header"><td colspan="4" class="p-3 text-xs font-bold text-slate-200 uppercase tracking-widest pl-4">${cat} Control</td></tr>`;
-                        filtered.forEach(r => {
-                            const isOnline = onlineCids.has(r[1]);
-                            tableBody.innerHTML += `
-                                <tr class="hover:bg-white/5 transition-colors">
-                                    <td class="p-4 font-bold text-blue-400 pl-6">
-                                        ${r[0]} 
-                                        ${isOnline ? '<span class="ml-3 bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[9px] font-black animate-pulse-light">● ONLINE</span>' : ''}
-                                    </td>
-                                    <td class="p-4 text-center text-slate-400 font-mono">${r[1]}</td>
-                                    <td class="p-4 text-center text-slate-300 font-mono">${r[2]}</td>
-                                    <td class="p-4 text-center text-slate-300">${r[3]}</td>
-                                </tr>`;
-                        });
-                    }
-                });
-                statusBadge.textContent = "LIVE SYNCED";
-                statusBadge.className = "text-[10px] bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded font-mono tracking-widest";
-            } catch (e) {
-                statusBadge.textContent = "SYNC ERROR";
-                statusBadge.className = "text-[10px] bg-red-500/10 text-red-400 px-3 py-1 rounded font-mono tracking-widest";
-            }
-        }
-
-        setInterval(updateRoster, 30000);
-        updateRoster();
-    </script>
 </body>
 </html>
