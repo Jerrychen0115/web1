@@ -140,7 +140,7 @@
             border-color: rgba(56, 189, 248, 0.4);
         }
 
-        /* 贊助商 Logo 樣式 */
+        /* 贊助商 Logo 樣式 (預設彩色、不透明) */
         .sponsor-logo {
             filter: grayscale(0%) brightness(1);
             opacity: 1;
@@ -174,7 +174,7 @@
                             <svg class="w-3 h-3 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </a>
                         <div class="dropdown-menu">
-                            <a href="https://ais.caa.gov.tw/eaip/" target="_blank" class="dropdown-item">eAIP</a>
+                            <a href="https://ais.caa.gov.tw/eaip/" target="_blank" class="dropdown-item">eAIP (台灣航行資料庫)</a>
                             <a href="https://vats.im/vdgs" target="_blank" class="dropdown-item">Taipei ACDM</a>
                         </div>
                     </div>
@@ -183,6 +183,7 @@
                 </div>
             </div>
 
+            <!-- 右側：社群圖示 + 語言切換選單 -->
             <div class="hidden lg:flex items-center gap-4">
                 <div class="flex items-center gap-3">
                     <a href="https://discord.gg/pCjzjxmE5U" target="_blank" class="social-btn w-10 h-10 rounded-full flex items-center justify-center text-slate-300 hover:text-sky-400 shadow-md" title="Discord">
@@ -196,6 +197,7 @@
                     </a>
                 </div>
 
+                <!-- 語言切換下拉選單 (帶地球圖示) -->
                 <div class="dropdown ml-2">
                     <button class="flex items-center gap-2 px-3 py-2 rounded-lg bg-black/30 border border-white/10 text-slate-200 hover:text-sky-400 hover:border-sky-400/40 transition-all text-sm font-medium">
                         <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -258,14 +260,6 @@
             </section>
         </div>
 
-        <!-- VATSIM Events Section -->
-        <section class="glass-card p-6">
-            <h3 class="text-xs font-bold text-sky-300 uppercase tracking-widest mb-4">Taiwan Related Events</h3>
-            <div id="events-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <p class="text-slate-500 text-sm col-span-full">Loading events...</p>
-            </div>
-        </section>
-
         <section class="glass-card overflow-hidden">
             <div class="p-4 border-b border-white/10 bg-black/20">
                 <h3 class="text-xs font-bold text-slate-200 uppercase tracking-widest">Taiwan Major Airports Flight Board</h3>
@@ -291,6 +285,7 @@
     <footer class="mt-20 pt-12 pb-8 bg-slate-950/80 backdrop-blur-xl border-t border-white/10 text-slate-400 text-sm relative z-10 -mx-4 -mb-4 md:-mx-8 md:-mb-8 px-6 md:px-12">
         <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-10 pb-12 border-b border-white/10">
             
+            <!-- 左側品牌與簡介 (佔 2 欄寬) -->
             <div class="lg:col-span-2 space-y-4">
                 <img src="VATROC.png" alt="Logo" class="h-10 w-auto object-contain">
                 <p class="text-xs text-slate-400 leading-relaxed">
@@ -310,21 +305,18 @@
             </div>
             <div class="lg:col-span-2 space-y-3">
                 <h4 class="text-white font-bold text-xs uppercase tracking-widest">合作夥伴</h4>
-                <div class="grid grid-cols-5 gap-3 pt-1">
-                    <a class="block bg-black/30 p-2 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center min-h-[60px]">
-                        <img src="VATSIM.png" alt="Sponsor 1" class="max-h-12 w-auto object-contain sponsor-logo">
+                <div class="grid grid-cols-4 gap-3 pt-1">
+                    <a href="class="block bg-black/30 p-4 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center">
+                        <img src="VATSIM.png" alt="Sponsor 1" class="h-20 mx-auto object-contain sponsor-logo">
                     </a>
-                    <a class="block bg-black/30 p-2 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center min-h-[60px]">
-                        <img src="VATPRC.png" alt="Sponsor 2" class="max-h-12 w-auto object-contain sponsor-logo">
+                    <a href="class="block bg-black/30 p-4 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center">
+                        <img src="VATPRC.png" alt="Sponsor 2" class="h-20 mx-auto object-contain sponsor-logo">
                     </a>
-                    <a class="block bg-black/30 p-2 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center min-h-[60px]">
-                        <img src="HKvacc.png" alt="Sponsor 3" class="max-h-12 w-auto object-contain sponsor-logo">
+                    <a href="class="block bg-black/30 p-4 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center">
+                        <img src="HKvacc.png" alt="Sponsor 3" class="h-20 mx-auto object-contain sponsor-logo">
                     </a>
-                    <a class="block bg-black/30 p-2 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center min-h-[60px]">
-                        <img src="VATKOR.png" alt="Sponsor 4" class="max-h-12 w-auto object-contain sponsor-logo">
-                    </a>
-                    <a class="block bg-black/30 p-2 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center min-h-[60px]">
-                        <img src="VATAPAC.png" alt="Sponsor 5" class="max-h-12 w-auto object-contain sponsor-logo">
+                    <a href="class="block bg-black/30 p-4 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center">
+                        <img src="VATAPAC.png" alt="Sponsor 4" class="h-20 mx-auto object-contain sponsor-logo">
                     </a>
                 </div>
             </div>
@@ -337,7 +329,6 @@
         const API_URL = 'https://data.vatsim.net/v3/vatsim-data.json';
         const ATIS_API = 'https://data.vatsim.net/v3/afv-atis-data.json';
         const METAR_API = 'https://metar.vatsim.net/metar.php?id=';
-        const EVENTS_API = 'https://my.vatsim.net/api/v2/events/latest';
         
         const AIRPORTS = ['RCTP', 'RCKH', 'RCSS', 'RCFN', 'RCMQ'];
         const ATC_PREFIXES = ['RCTP', 'RCSS', 'RCKH', 'RCFN', 'RCMQ', 'TPE_'];
@@ -473,73 +464,9 @@
             }
         }
 
-        async function updateEvents() {
-            const container = document.getElementById('events-container');
-            try {
-                const res = await fetch(EVENTS_API);
-                const result = await res.json();
-                
-                const events = result.data || result;
-
-                // 篩選關鍵字清單（包含地名與對應的機場 ICAO 代碼）
-                const filterKeywords = [
-                    'taipei', 'kaohsiung', 'penghu', 'songshan', 'hualien', 'taitung',
-                    'rctp', 'rckh', 'rcss', 'rcqc', 'rcyu', 'rcfn'
-                ];
-
-                const relevantEvents = events.filter(e => {
-                    const searchContent = [
-                        e.name,
-                        e.title,
-                        e.description,
-                        e.short_description,
-                        JSON.stringify(e.airports || [])
-                    ].filter(Boolean).join(' ').toLowerCase();
-
-                    return filterKeywords.some(keyword => searchContent.includes(keyword));
-                });
-
-                if (relevantEvents.length === 0) {
-                    container.innerHTML = '<p class="text-slate-500 text-sm col-span-full">Currently no upcoming Taiwan events.</p>';
-                    return;
-                }
-
-                container.innerHTML = relevantEvents.map(event => {
-                    const startTime = event.start_time || event.start ? new Date(event.start_time || event.start).toUTCString().slice(5, 22) : 'TBA';
-                    const banner = event.banner || 'https://events.vatsim.net/images/default-banner.png';
-                    const link = event.link || `https://my.vatsim.net/events/${event.id}`;
-                    const titleName = event.name || event.title || 'VATSIM Event';
-
-                    return `
-                        <a href="${link}" target="_blank" class="block bg-black/40 rounded-lg border border-white/5 overflow-hidden hover:border-sky-400/40 transition-all group">
-                            <div class="w-full aspect-video bg-slate-900/80 flex items-center justify-center overflow-hidden p-1">
-                                <img src="${banner}" 
-                                     alt="${titleName}" 
-                                     class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300" 
-                                     onerror="this.onerror=null; this.src='https://events.vatsim.net/images/default-banner.png';">
-                            </div>
-                            <div class="p-3 border-t border-white/5">
-                                <h4 class="font-bold text-sky-400 text-sm mb-1 group-hover:text-sky-300 truncate">${titleName}</h4>
-                                <p class="text-xs text-slate-300 font-mono mb-2">⏰ ${startTime} UTC</p>
-                                <p class="text-xs text-slate-400 line-clamp-2">${event.short_description || event.description || ''}</p>
-                            </div>
-                        </a>
-                    `;
-                }).join('');
-
-            } catch (e) {
-                console.error("Events update failed:", e);
-                container.innerHTML = '<p class="text-red-400/70 text-sm col-span-full">Failed to load events data.</p>';
-            }
-        }
-
-        updateData(); 
-        updateMetars();
-        updateEvents();
-
+        updateData(); updateMetars();
         setInterval(updateData, 30000); 
         setInterval(updateMetars, 300000);
-        setInterval(updateEvents, 600000);
     </script>
 </body>
 </html>
