@@ -31,7 +31,6 @@
         .glass-card { 
             background: rgba(15, 23, 42, 0.4); 
             backdrop-filter: blur(12px); 
-            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.08); 
             border-radius: 16px; 
         }
@@ -150,40 +149,19 @@
             transform: translateY(-2px);
         }
 
-        /* 表單輸入框維持高品質質感 */
-        input, textarea, select {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            color: white !important;
-            font-size: 1rem;
-        }
-
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: #38bdf8 !important;
-            background: rgba(255, 255, 255, 0.1) !important;
-            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.2);
-        }
-
-        label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #7dd3fc;
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px -5px rgba(56, 189, 248, 0.4);
+        .form-iframe-container {
+            position: relative;
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #ffffff;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
 <body class="p-4 md:p-8 flex flex-col min-h-screen">
 
-    <!-- Starlux 風格置頂導覽列 -->
+    <!-- Starlux 風格置頂導覽列 (維持與主頁一致的標準尺寸與邊距) -->
     <nav class="starlux-nav -mx-4 -mt-4 md:-mx-8 md:-mt-8 px-6 py-4 mb-10 shadow-2xl">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             
@@ -201,7 +179,7 @@
                             <svg class="w-3 h-3 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </a>
                         <div class="dropdown-menu">
-                            <a href="https://ais.caa.gov.tw/eaip/" target="_blank" class="dropdown-item">eAIP (台灣航行資料庫)</a>
+                            <a href="https://ais.caa.gov.tw/eaip/" target="_blank" class="dropdown-item">eAIP</a>
                             <a href="https://vats.im/vdgs" target="_blank" class="dropdown-item">Taipei ACDM</a>
                         </div>
                     </div>
@@ -210,7 +188,6 @@
                 </div>
             </div>
 
-            <!-- 右側：社群圖示 + 語言切換選單 -->
             <div class="hidden lg:flex items-center gap-4">
                 <div class="flex items-center gap-3">
                     <a href="https://discord.gg/pCjzjxmE5U" target="_blank" class="social-btn w-10 h-10 rounded-full flex items-center justify-center text-slate-300 hover:text-sky-400 shadow-md" title="Discord">
@@ -224,7 +201,6 @@
                     </a>
                 </div>
 
-                <!-- 語言切換下拉選單 -->
                 <div class="dropdown ml-2">
                     <button class="flex items-center gap-2 px-3 py-2 rounded-lg bg-black/30 border border-white/10 text-slate-200 hover:text-sky-400 hover:border-sky-400/40 transition-all text-sm font-medium">
                         <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -243,57 +219,27 @@
         </div>
     </nav>
 
-    <main class="max-w-4xl mx-auto py-6 relative z-10 flex-grow">
-        <header class="mb-12 text-center md:text-left">
-            <h1 class="text-4xl font-black tracking-tight text-white mb-3 text-shadow-sm">ATC APPLICATION</h1>
-            <p class="text-sky-300 uppercase tracking-widest text-sm font-bold text-shadow-sm">成為台北飛航情報區的一份子</p>
+    <!-- 下方主內容區：維持與主頁相同的 max-w-7xl 比例 -->
+    <main class="max-w-7xl mx-auto space-y-6 relative z-10 flex-grow w-full">
+        <header class="mb-6">
+            <h1 class="text-3xl font-black tracking-tighter text-white text-shadow-sm">ATC APPLICATION</h1>
+            <p class="text-xs text-sky-300 font-mono tracking-widest mt-1 text-shadow-sm">成為台北飛航情報區的一份子</p>
         </header>
 
-        <form 
-            action="https://forms.gle/7DHDfsjVjZ2SnAex6" 
-            method="POST" 
-            class="glass-card p-8 md:p-12 space-y-8 shadow-2xl">
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                <div class="space-y-2">
-                    <label>VATSIM ID & Your Email (Both)</label>
-                    <input type="text" name="entry.2098958242" required placeholder="e.g. 1000001" class="w-full px-4 py-3 rounded-xl">
-                </div>
-
-                <div class="space-y-2">
-                    <label>English Name</label>
-                    <input type="text" name="entry.116189681" required placeholder="e.g. Chen Tai-Ming" class="w-full px-4 py-3 rounded-xl">
-                </div>
-
-                <div class="space-y-2">
-                    <label>Birth Year / Education Status</label>
-                    <input type="number" name="entry.1675845772" required placeholder="e.g. 2000" class="w-full px-4 py-3 rounded-xl">
-                </div>
-
+        <!-- Google 表單嵌入容器 -->
+        <section class="glass-card p-6">
+            <div class="form-iframe-container w-full">
+                <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeVwDpBDDgmc6QnRDLwD-Zzod9gq5Qrghiql8ee3r6V52P80A/viewform?embedded=true" 
+                        width="100%" 
+                        height="950px" 
+                        frameborder="0" 
+                        marginheight="0" 
+                        marginwidth="0">載入中…</iframe>
             </div>
+        </section>
 
-            <div class="space-y-2">
-                <label>Flightsim Experience & one referee recommends you to accelerate ATC (referee include His/Her VATSIM ID & name)</label>
-                <textarea name="entry.980750356" rows="4" required placeholder="請簡述您的飛行模擬經驗並且附上一位推薦人(推薦人需附上本人VATSIM ID & 名字)" class="w-full px-4 py-3 rounded-xl"></textarea>
-            </div>
-
-            <div class="space-y-2">
-                <label>Anything else you want to let us know? / Apply for visiting controller ? </label>
-                <textarea name="entry.1210745125" rows="4" placeholder="（選填）" class="w-full px-4 py-3 rounded-xl"></textarea>
-            </div>
-
-            <div class="pt-6 flex flex-col md:flex-row items-center justify-between gap-6">
-                <p class="text-xs text-slate-400 max-w-xs text-center md:text-left">
-                    提交後即代表您同意 VATROC 的訓練規範與隱私條款。
-                </p>
-                <button type="submit" class="btn-submit w-full md:w-auto bg-sky-600 hover:bg-sky-500 text-white px-12 py-4 rounded-xl font-bold transition-all shadow-xl">
-                    提交申請 SUBMIT
-                </button>
-            </div>
-        </form>
-        <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) {alert('申請已送出！'); window.location='index.html';}"></iframe>
-        <div class="mt-8 text-center">
-            <a href="joinatc.html" class="text-slate-400 hover:text-white transition-colors text-sm">
+        <div class="text-center pt-2">
+            <a href="joinatc.html" class="text-slate-400 hover:text-white transition-colors text-sm font-medium">
                 ← 返回招募資訊頁面 Back to info
             </a>
         </div>
@@ -303,7 +249,6 @@
     <footer class="mt-20 pt-12 pb-8 bg-slate-950/80 backdrop-blur-xl border-t border-white/10 text-slate-400 text-sm relative z-10 -mx-4 -mb-4 md:-mx-8 md:-mb-8 px-6 md:px-12">
         <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-10 pb-12 border-b border-white/10">
             
-            <!-- 左側品牌與簡介 -->
             <div class="lg:col-span-2 space-y-4">
                 <img src="VATROC.png" alt="Logo" class="h-10 w-auto object-contain">
                 <p class="text-xs text-slate-400 leading-relaxed">
@@ -322,26 +267,26 @@
                 </div>
             </div>
 
-    
             <div class="lg:col-span-2 space-y-3">
                 <h4 class="text-white font-bold text-xs uppercase tracking-widest">合作夥伴</h4>
-                <div class="grid grid-cols-4 gap-3 pt-1">
-                    <a href="class="block bg-black/30 p-4 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center">
-                        <img src="VATSIM.png" alt="Sponsor 1" class="h-20 mx-auto object-contain sponsor-logo">
+                <div class="grid grid-cols-5 gap-3 pt-1">
+                    <a class="block bg-black/30 p-2 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center min-h-[60px]">
+                        <img src="VATSIM.png" alt="Sponsor 1" class="max-h-12 w-auto object-contain sponsor-logo">
                     </a>
-                    <a href="class="block bg-black/30 p-4 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center">
-                        <img src="VATPRC.png" alt="Sponsor 2" class="h-20 mx-auto object-contain sponsor-logo">
+                    <a class="block bg-black/30 p-2 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center min-h-[60px]">
+                        <img src="VATPRC.png" alt="Sponsor 2" class="max-h-12 w-auto object-contain sponsor-logo">
                     </a>
-                    <a href="class="block bg-black/30 p-4 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center">
-                        <img src="HKvacc.png" alt="Sponsor 3" class="h-20 mx-auto object-contain sponsor-logo">
+                    <a class="block bg-black/30 p-2 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center min-h-[60px]">
+                        <img src="HKvacc.png" alt="Sponsor 3" class="max-h-12 w-auto object-contain sponsor-logo">
                     </a>
-                    <a href="class="block bg-black/30 p-4 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center">
-                        <img src="VATKOR.png" alt="Sponsor 4" class="h-20 mx-auto object-contain sponsor-logo">
+                    <a class="block bg-black/30 p-2 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center min-h-[60px]">
+                        <img src="VATKOR.png" alt="Sponsor 4" class="max-h-12 w-auto object-contain sponsor-logo">
                     </a>
-                    <a href="class="block bg-black/30 p-4 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center">
-                        <img src="VATAPAC.png" alt="Sponsor 4" class="h-20 mx-auto object-contain sponsor-logo">
+                    <a class="block bg-black/30 p-2 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center min-h-[60px]">
+                        <img src="VATAPAC.png" alt="Sponsor 5" class="max-h-12 w-auto object-contain sponsor-logo">
                     </a>
                 </div>
+            </div>
 
         </div>
     </footer>
