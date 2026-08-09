@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=1280">
+    <title>VATROC | 中華民國虛擬航管組織 - Staff</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        body { 
+            background-image: url('TP.png'); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            font-family: 'Inter', sans-serif; 
+            color: #f8fafc; 
+            min-height: 100vh; 
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(11, 15, 25, 0.75); 
+            z-index: -1;
+        }
+
+        .glass-card { 
+            background: rgba(15, 23, 42, 0.45); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            border-radius: 16px; 
+        }
+        
+        .text-shadow-sm {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        .vatroc-logo {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* Starlux Virtual 風格導覽列樣式 */
+        .starlux-nav {
+            background: rgba(10, 14, 23, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .nav-link {
+            position: relative;
+            display: inline-block;
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: #38bdf8;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover {
+            transform: translateY(-4px);
+        }
+
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 12px;
+            width: 220px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            z-index: 100;
+            padding: 8px 0;
+        }
+
+        .dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 10px 16px;
+            font-size: 13px;
+            color: #cbd5e1;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(56, 189, 248, 0.1);
+            color: #38bdf8;
+            padding-left: 20px;
+        }
+
+        .social-btn {
+            background-color: #162032;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .social-btn:hover {
+            transform: scale(1.15);
+            background-color: #1e293b;
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+
+        .sponsor-logo {
+            filter: grayscale(0%) brightness(1);
+            opacity: 1;
+            transition: all 0.3s ease;
+        }
+        .sponsor-logo:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Staff 卡片特殊懸停特效 */
+        .staff-card {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .staff-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(56, 189, 248, 0.4);
+            box-shadow: 0 12px 30px -10px rgba(56, 189, 248, 0.2);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex flex-col min-h-screen">
+
+    <!-- Starlux 風格置頂導覽列 -->
+    <nav class="starlux-nav -mx-4 -mt-4 md:-mx-8 md:-mt-8 px-6 py-4 mb-10 shadow-2xl">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            
+            <div class="flex items-center gap-10">
+                <a href="index.html" class="flex items-center gap-3">
+                    <img src="VATROC.png" alt="VATROC Logo" class="vatroc-logo">
+                </a>
+                <div class="hidden md:flex gap-8 text-sm font-medium tracking-wide text-slate-200 items-center">
+                    <a href="index.html" class="nav-link hover:text-sky-400">Main Page</a>
+                    <a href="staff.html" class="nav-link active text-white">ATC center</a>
+                    
+                    <div class="dropdown">
+                        <a href="#" class="nav-link hover:text-sky-400 flex items-center gap-1">
+                            Pilot resources 
+                            <svg class="w-3 h-3 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </a>
+                        <div class="dropdown-menu">
+                            <a href="https://ais.caa.gov.tw/eaip/" target="_blank" class="dropdown-item">eAIP</a>
+                            <a href="https://vats.im/vdgs" target="_blank" class="dropdown-item">Taipei ACDM</a>
+                        </div>
+                    </div>
+
+                    <a href="joinatc.html" class="nav-link hover:text-sky-400">ATC training / Visiting</a>
+                </div>
+            </div>
+
+            <div class="hidden lg:flex items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <a href="https://discord.gg/pCjzjxmE5U" target="_blank" class="social-btn w-10 h-10 rounded-full flex items-center justify-center text-slate-300 hover:text-sky-400 shadow-md" title="Discord">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.927 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+                    </a>
+                    <a href="https://www.instagram.com/vatroc/" target="_blank" class="social-btn w-10 h-10 rounded-full flex items-center justify-center text-slate-300 hover:text-sky-400 shadow-md" title="Instagram">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                    </a>
+                    <a href="https://www.facebook.com/VATROC" target="_blank" class="social-btn w-10 h-10 rounded-full flex items-center justify-center text-slate-300 hover:text-sky-400 shadow-md" title="Facebook">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M9 8H6v4h3v12h5V12h3.642L18 8h-4V6.333C14 5.37 14.5 5 15.5 5H18V0h-3.808C10.59 0 9 1.588 9 4.7V8z"/></svg>
+                    </a>
+                </div>
+
+                <div class="dropdown ml-2">
+                    <button class="flex items-center gap-2 px-3 py-2 rounded-lg bg-black/30 border border-white/10 text-slate-200 hover:text-sky-400 hover:border-sky-400/40 transition-all text-sm font-medium">
+                        <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+                        </svg>
+                        <span>繁體中文</span>
+                        <svg class="w-3 h-3 transition-transform duration-300 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="dropdown-menu right-0 left-auto">
+                        <a href="#" class="dropdown-item flex items-center justify-between text-sky-400 font-semibold">繁體中文 <span>✓</span></a>
+                        <a href="staff-en.html" class="dropdown-item">English</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto space-y-10 relative z-10 flex-grow">
+        
+        <!-- Page Header -->
+        <header class="text-center md:text-left flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-white/10 pb-6">
+            <div>
+                <span class="text-xs text-sky-400 font-mono tracking-widest uppercase block mb-1">VATROC ADMINISTRATION</span>
+                <h1 class="text-4xl font-black tracking-tight text-white text-shadow-sm">組織成員與管理團隊 (Staff Team)</h1>
+                <p class="text-slate-400 text-sm mt-2">帶領中華民國虛擬航管組織運作、管制培訓與航路服務的幕後核心團隊。</p>
+            </div>
+            <div class="glass-card px-4 py-2 text-xs font-mono text-slate-300 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Active Status: Normal</span>
+            </div>
+        </header>
+
+        <!-- Executive Section (VATROC Division Directors) -->
+        <section class="space-y-6">
+            <div class="flex items-center gap-3">
+                <div class="w-1.5 h-6 bg-sky-400 rounded-full"></div>
+                <h2 class="text-xl font-bold tracking-tight text-white uppercase tracking-wider">分部管理層 (Executive Staff)</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- Division Director (VATUSA/VATROC equivalent: vTL / vRM) -> Let's use standard VATSIM Division Staff Roles -->
+                <div class="glass-card p-6 staff-card flex flex-col justify-between border-t-4 border-t-sky-400">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="px-3 py-1 bg-sky-500/20 text-sky-400 border border-sky-500/30 rounded-full text-xs font-mono font-bold">VATROC 1</span>
+                            <span class="text-xs font-mono text-slate-400">CID: 1065234</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1">Tzu-Hsiang Chao</h3>
+                        <p class="text-xs text-sky-300 font-semibold uppercase tracking-wider mb-4">Division Director (VATROC1)</p>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-6">Responsible for the operations of VATROC。</p>
+                    </div>
+                    <div class="pt-4 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+                        <span class="font-mono">Rating: C3</span>
+
+                    </div>
+                </div>
+
+                <!-- Division Training Coordinator -->
+                <div class="glass-card p-6 staff-card flex flex-col justify-between border-t-4 border-t-amber-400">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="px-3 py-1 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-full text-xs font-mono font-bold">VATROC 2</span>
+                            <span class="text-xs font-mono text-slate-400">CID: 1464608</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1">PoChun Wu</h3>
+                        <p class="text-xs text-amber-300 font-semibold uppercase tracking-wider mb-4">Deputy Division Director (VATROC2)</p>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-6">Responsible for the operations of VATROC。</p>
+                    </div>
+                    <div class="pt-4 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+                        <span class="font-mono">Rating: C1</span>
+                    </div>
+                </div>
+
+                <!-- Division Events Coordinator -->
+                <div class="glass-card p-6 staff-card flex flex-col justify-between border-t-4 border-t-emerald-400">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="px-3 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full text-xs font-mono font-bold">VATROC 3</span>
+                            <span class="text-xs font-mono text-slate-400">CID: 1294668</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1">Jing-Wei Li</h3>
+                        <p class="text-xs text-emerald-300 font-semibold uppercase tracking-wider mb-4">Training Director (VATROC3)</p>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-6">負責管制員訓練。</p>
+                    </div>
+                    <div class="pt-4 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+                        <span class="font-mono">Rating: I1</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Operations & Web Department -->
+        <section class="space-y-6">
+            <div class="flex items-center gap-3">
+                <div class="w-1.5 h-6 bg-purple-400 rounded-full"></div>
+                <h2 class="text-xl font-bold tracking-tight text-white uppercase tracking-wider">技術團隊 (Operations & Tech)</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- Operations Coordinator -->
+                <div class="glass-card p-6 staff-card flex flex-col justify-between border-t-4 border-t-purple-400">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="text-xs font-mono text-slate-400">CID: 1576737</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1">Hugo Yeh</h3>
+                        <p class="text-xs text-purple-300 font-semibold uppercase tracking-wider mb-4">Event Director</p>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-6">Responsible for organizing VATROC events。</p>
+                    </div>
+                    <div class="pt-4 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+                        <span class="font-mono">Rating: S1</span>
+                    </div>
+                </div>
+
+                <!-- Web / Tech Support -->
+                <div class="glass-card p-6 staff-card flex flex-col justify-between border-t-4 border-t-indigo-400">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="text-xs font-mono text-slate-400">CID: 1654972</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1">Chen Jerry</h3>
+                        <p class="text-xs text-indigo-300 font-semibold uppercase tracking-wider mb-4">Website Design & Sector update</p>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-6">Responsible for setting up the VATROC website and updating the sector。</p>
+                    </div>
+                    <div class="pt-4 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+                        <span class="font-mono">Rating: S2</span>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 staff-card flex flex-col justify-between border-t-4 border-t-indigo-400">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="text-xs font-mono text-slate-400">CID: 1791020</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1">Gabriel Chang</h3>
+                        <p class="text-xs text-indigo-300 font-semibold uppercase tracking-wider mb-4">Website Design & Sector update</p>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-6">Responsible for setting up the VATROC website and updating the sector。</p>
+                    </div>
+                    <div class="pt-4 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+                        <span class="font-mono">Rating: S1</span>
+                       
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <footer class="mt-20 pt-12 pb-8 bg-slate-950/80 backdrop-blur-xl border-t border-white/10 text-slate-400 text-sm relative z-10 -mx-4 -mb-4 md:-mx-8 md:-mb-8 px-6 md:px-12">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-10 pb-12 border-b border-white/10">
+            
+            <div class="lg:col-span-2 space-y-4">
+                <img src="VATROC.png" alt="Logo" class="h-10 w-auto object-contain">
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    中華民國虛擬航管組織 (VATROC) 提供專業的虛擬空中交通管制與飛行員資源。
+                </p>
+                <div class="flex items-center gap-3 pt-2">
+                    <a href="https://discord.gg/pCjzjxmE5U" target="_blank" class="social-btn w-10 h-10 rounded-full flex items-center justify-center text-slate-300 hover:text-sky-400 shadow-md" title="Discord">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.927 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+                    </a>
+                    <a href="https://www.instagram.com/vatroc/" target="_blank" class="social-btn w-10 h-10 rounded-full flex items-center justify-center text-slate-300 hover:text-sky-400 shadow-md" title="Instagram">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                    </a>
+                    <a href="https://www.facebook.com/VATROC" target="_blank" class="social-btn w-10 h-10 rounded-full flex items-center justify-center text-slate-300 hover:text-sky-400 shadow-md" title="Facebook">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M9 8H6v4h3v12h5V12h3.642L18 8h-4V6.333C14 5.37 14.5 5 15.5 5H18V0h-3.808C10.59 0 9 1.588 9 4.7V8z"/></svg>
+                    </a>
+                </div>
+            </div>
+            <div class="lg:col-span-2 space-y-3">
+                <h4 class="text-white font-bold text-xs uppercase tracking-widest">合作夥伴</h4>
+                <div class="grid grid-cols-5 gap-3 pt-1">
+                    <a class="block bg-black/30 p-2 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center min-h-[60px]">
+                        <img src="VATSIM.png" alt="Sponsor 1" class="max-h-12 w-auto object-contain sponsor-logo">
+                    </a>
+                    <a class="block bg-black/30 p-2 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center min-h-[60px]">
+                        <img src="VATPRC.png" alt="Sponsor 2" class="max-h-12 w-auto object-contain sponsor-logo">
+                    </a>
+                    <a class="block bg-black/30 p-2 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center min-h-[60px]">
+                        <img src="HKvacc.png" alt="Sponsor 3" class="max-h-12 w-auto object-contain sponsor-logo">
+                    </a>
+                    <a class="block bg-black/30 p-2 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center min-h-[60px]">
+                        <img src="VATKOR.png" alt="Sponsor 4" class="max-h-12 w-auto object-contain sponsor-logo">
+                    </a>
+                    <a class="block bg-black/30 p-2 rounded-lg border border-white/5 hover:border-sky-400/40 transition-all text-center flex items-center justify-center min-h-[60px]">
+                        <img src="VATAPAC.png" alt="Sponsor 5" class="max-h-12 w-auto object-contain sponsor-logo">
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </footer>
+
+</body>
+</html>
