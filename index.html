@@ -48,7 +48,8 @@
             object-fit: contain;
         }
 
-        .va-nav {
+        /* 調整 Navbar 樣式：加入深藍色半透明背景與毛玻璃效果 */
+        .starlux-nav {
             background: rgba(10, 14, 23, 0.85);
             backdrop-filter: blur(16px);
             border-bottom: 1px solid rgba(212, 175, 55, 0.2);
@@ -467,7 +468,6 @@
                 
                 const events = result.data || result;
 
-                // 篩選關鍵字清單（包含地名與對應的機場 ICAO 代碼）
                 const filterKeywords = [
                     'taipei', 'kaohsiung', 'penghu', 'songshan', 'hualien', 'taitung',
                     'rctp', 'rckh', 'rcss', 'rcqc', 'rcyu', 'rcfn'
