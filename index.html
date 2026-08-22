@@ -48,7 +48,6 @@
             object-fit: contain;
         }
 
-        /* 調整 Navbar 樣式：加入深藍色半透明背景與毛玻璃效果 */
         .starlux-nav {
             background: rgba(10, 14, 23, 0.85);
             backdrop-filter: blur(16px);
@@ -178,7 +177,16 @@
                     </div>
 
                     <a href="joinatc.html" class="nav-link hover:text-sky-400">ATC Training / Visiting</a>
-                    <a href="Division.html" class="nav-link hover:text-sky-400">Staff</a>
+                    <div class="dropdown">
+                        <a href="#" class="nav-link flex items-center gap-1">
+                            About Us
+                            <svg class="w-3 h-3 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </a>
+                        <div class="dropdown-menu">
+                            <a href="Division.html" target="_blank" class="dropdown-item">Staff</a>
+                            <a href="Privacypolicy.html" target="_blank" class="dropdown-item">Privacy Policy</a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
